@@ -63,8 +63,80 @@ automatically generated table by triggers (AFTER INSERT, AFTER UPDATE, AFTER DEL
 temporary table
 
 **Vehicle_System**
-| id | Part_and_Service_ID | part_group_id | description                    | count | price | amount | avaible |
-|----|---------------------|---------------|--------------------------------|-------|-------|--------|---------|
-| 1  | 3                   | 1             | менять вместе с медной смазкой | 1     | 2400  | 2400   | false   |
-| 2  | 23                  | 7             |                                | 5     | 70    | 350    | true    |
-| 3  | 38                  | 8             | + смазка                       | 1     | 500   | 500    | false   |
+| id | Part_and_Service_ID | part_group_id | description                    | count | price | amount | available |
+|----|---------------------|---------------|--------------------------------|-------|-------|--------|-----------|
+| 1  | 3                   | 1             | менять вместе с медной смазкой | 1     | 2400  | 2400   | false     |
+| 2  | 23                  | 7             |                                | 5     | 70    | 350    | true      |
+| 3  | 38                  | 8             | + смазка                       | 1     | 500   | 500    | false     |
+
+## API
+
+---
+Spendings
+1. Create Spending  
+HTTP: POST  
+URL: /api/spending  
+  ```json
+  {
+    "date": "2024-06-16",
+    "Part_and_Service_ID": 1,
+    "description": "",
+    "count": 30,
+    "amount": 1615.15
+  }
+```
+
+2. Get All Spending  
+HTTP: GET  
+URL: /api/spending  
+  ```json
+  [
+    {
+      "id": 1,
+      "date": "2024-06-16",
+      "Part_and_Service_ID": 1,
+      "description": "",
+      "count": 30,
+      "amount": 1615.15
+    },
+    {
+      "id": 2,
+      "date": "2024-06-20",
+      "Part_and_Service_ID": 2,
+      "description": "кузов + коврики",
+      "count": 1,
+      "amount": 100
+    }
+  ]
+  ```
+
+3. Get Spending by ID  
+HTTP: GET  
+URL: /api/spending/{id}  
+  ```json
+  {
+    "id": 1,
+    "date": "2024-06-16",
+    "Part_and_Service_ID": 1,
+    "description": "",
+    "count": 30,
+    "amount": 1615.15
+  }
+```
+
+4. Update Spending  
+HTTP: PUT  
+URL: /api/spending/{id}  
+  ```json
+  {
+    "date": "2024-06-16",
+    "Part_and_Service_ID": 1,
+    "description": "Обновленное описание",
+    "count": 30,
+    "amount": 1700.00
+  }
+  ```
+
+5. Delete Spending  
+HTTP: DELETE  
+URL: /api/spending/{id}  

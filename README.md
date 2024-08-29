@@ -3,6 +3,7 @@ application for cars
 ## Tables db
 
 Unique id numbering of all tables with UUID.randomUUID()
+separate database for each user
 
 **Part_and_Service**
 | id | description                                     | type |
@@ -140,3 +141,11 @@ URL: /api/spending/{id}
 5. Delete Spending  
 HTTP: DELETE  
 URL: /api/spending/{id}  
+
+## Steps
+a temporary unique database is created for an unauthorized user, which is bound to a temporary key.  
+after registration, this table is bound to the current user.
+
+when authorizing, a connection to an existing database is made and the client works with it.
+
+## Prootype frontend

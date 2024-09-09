@@ -8,6 +8,7 @@ public class RoadanalyzerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RoadanalyzerApplication.class, args);
+		System.out.println("Application started great");
 	}
 
 }

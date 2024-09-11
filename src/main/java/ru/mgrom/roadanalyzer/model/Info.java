@@ -10,19 +10,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * description of expenses [nomenclature list]
+ * vehicle information, e.g.: {id=1, name="vehicle date", value="14.09.2013"}
  */
 @Data
 @Entity
-@Table(name = "part_and_service")
-public class PartAndService {
+@Table(name = "info")
+public class Info {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @EqualsAndHashCode.Include
     Long id;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Column(name = "key_info", nullable = false)
+    private String keyInfo;
 
-    private Long type; // table expense_type
+    @Column(name = "value_info", nullable = false)
+    private String valueInfo;
 }

@@ -10,12 +10,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * description of expenses [nomenclature list]
+ * type of expense (e.g. fuel, services, spare parts) [type expense list]
  */
 @Data
 @Entity
-@Table(name = "part_and_service")
-public class PartAndService {
+@Table(name = "expense_type")
+public class ExpenseType {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @EqualsAndHashCode.Include
@@ -23,6 +23,4 @@ public class PartAndService {
 
     @Column(name = "description", nullable = false)
     private String description;
-
-    private Long type; // table expense_type
 }

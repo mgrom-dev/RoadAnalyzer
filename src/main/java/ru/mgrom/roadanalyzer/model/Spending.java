@@ -1,5 +1,7 @@
 package ru.mgrom.roadanalyzer.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,19 +12,30 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * description of expenses [nomenclature list]
+ * detailed expenses by date
  */
 @Data
 @Entity
-@Table(name = "part_and_service")
-public class PartAndService {
+@Table(name = "spending")
+public class Spending {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @EqualsAndHashCode.Include
     Long id;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "part_and_service_id")
+    private Long partAndServiceId; // table part_and_service
+
     private String description;
 
-    private Long type; // table expense_type
+    private Double count;
+
+    private Double amount;
+
+    public Spending() {
+        this.description = "";
+    }
 }

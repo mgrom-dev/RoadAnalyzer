@@ -1,4 +1,7 @@
 spring:
+  spring:
+    thymeleaf:
+      cache: false
   application:
     name: roadanalyzer
   datasource:

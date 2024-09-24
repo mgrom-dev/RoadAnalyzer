@@ -149,3 +149,9 @@ after registration, this table is bound to the current user.
 when authorizing, a connection to an existing database is made and the client works with it.
 
 ## Prootype frontend
+
+
+## links
+
+https://tools.webcrumbs.org/frontend-ai
+https://www.deepl.com/ru

@@ -1,5 +1,6 @@
 package ru.mgrom.roadanalyzer.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ru.mgrom.roadanalyzer.model.Spending;
@@ -26,8 +28,9 @@ public class SpendingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Spending>> getAll() {
-        return ResponseEntity.ok(spendingService.getAll());
+    public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false) LocalDate createdAtBefore,
+            @RequestParam(required = false) LocalDate createdAtAfter) {
+        return ResponseEntity.ok(spendingService.getAll(createdAtBefore, createdAtAfter));
     }
 
     @GetMapping("/{id}")

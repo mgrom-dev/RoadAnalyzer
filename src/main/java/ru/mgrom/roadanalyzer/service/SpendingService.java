@@ -1,5 +1,6 @@
 package ru.mgrom.roadanalyzer.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +21,10 @@ public class SpendingService {
         return spendingRepository.findById(id);
     }
 
-    public List<Spending> getAll() {
-        return spendingRepository.findAll();
+    public List<Spending> getAll(LocalDate createdAtBefore, LocalDate createdAtAfter) {
+        createdAtBefore = createdAtBefore == null ? LocalDate.MIN : createdAtBefore;
+        createdAtAfter = createdAtAfter == null ? LocalDate.MAX : createdAtAfter;
+        return spendingRepository.findByDateBetween(createdAtAfter, createdAtBefore);
     }
 
     public Spending create(Spending spending) {

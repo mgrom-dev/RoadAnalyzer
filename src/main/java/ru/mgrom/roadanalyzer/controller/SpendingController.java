@@ -33,6 +33,12 @@ public class SpendingController {
         return ResponseEntity.ok(spendingService.getAll(createdAtBefore, createdAtAfter));
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<Spending>> getAllByUser(@RequestParam(required = false) LocalDate createdAtBefore,
+            @RequestParam(required = false) LocalDate createdAtAfter) {
+        return ResponseEntity.ok(spendingService.getAllByUser(createdAtBefore, createdAtAfter));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Spending> get(@PathVariable Long id) {
         return spendingService.getById(id)

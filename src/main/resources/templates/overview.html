@@ -20,45 +20,46 @@
 </div>
 
 <script>
-    // Данные о расходах по месяцам
-    const labels = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: 'Расходы на содержание автомобиля ($)',
-            data: [500, 600, 450, 700, 800, 650, 750, 900, 850, 950, 1100, 1200], // Придуманные данные
-            backgroundColor: 'rgba(75, 192, 192, 0.5)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1,
-        }]
-    };
+    function updateExpensesChart(expenses) {
+        const monthlyExpenses = Array(12).fill(0); // Массив для хранения расходов по месяцам
 
-    const config = {
-        type: 'line', // Тип графика (линейный)
-        data: data,
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Сумма ($)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Месяцы'
+        expenses.forEach(expense => {
+            const month = new Date(expense.date).getMonth(); // Получаем номер месяца (0-11)
+            monthlyExpenses[month] += expense.amount; // Суммируем расходы по месяцам
+        });
+
+        const data = {
+            labels: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            datasets: [{
+                label: 'Расходы на содержание автомобиля (₽)',
+                data: monthlyExpenses,
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Сумма (₽)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Месяцы' }
                     }
                 }
             }
-        }
-    };
+        };
 
-    // Инициализация графика
-    const expensesChart = new Chart(
-        document.getElementById('expensesChart'),
-        config
-    );
+        // Инициализация графика
+        new Chart(document.getElementById('expensesChart'), config);
+    }
+
+    const expenses = fetchExpensesSync();
+    updateExpensesChart(expenses);
 </script>

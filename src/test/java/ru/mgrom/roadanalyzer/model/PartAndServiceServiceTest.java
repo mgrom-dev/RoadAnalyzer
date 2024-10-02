@@ -35,7 +35,9 @@ public class PartAndServiceServiceTest {
 
     @Test
     void getByIdOk() {
-        PartAndService partAndService = partAndServiceRepository.save(new PartAndService());
+        PartAndService partAndService = new PartAndService();
+        partAndService.setDescription("default");
+        partAndService = partAndServiceRepository.save(partAndService);
         assertTrue(partAndServiceService.getById(partAndService.getId()).isPresent());
     }
 
@@ -66,7 +68,9 @@ public class PartAndServiceServiceTest {
 
     @Test
     void delete() {
-        PartAndService created = partAndServiceRepository.save(new PartAndService());
+        PartAndService partAndService = new PartAndService();
+        partAndService.setDescription("default");
+        PartAndService created = partAndServiceRepository.save(partAndService);
         partAndServiceService.delete(created);
         assertTrue(partAndServiceRepository.findAll().size() == 0);
     }
@@ -77,7 +81,10 @@ public class PartAndServiceServiceTest {
         partAndService.setDescription("Автобензин АИ-95");
         partAndService.setType(1L);
 
-        Long id = partAndServiceRepository.save(new PartAndService()).getId();
+
+        PartAndService newPS = new PartAndService();
+        newPS.setDescription("default");
+        Long id = partAndServiceRepository.save(newPS).getId();
         PartAndService updated = partAndServiceService.update(id, partAndService).get();
         assertTrue(partAndService.getDescription().equals(updated.getDescription()));
         assertTrue(partAndService.getType() == updated.getType());

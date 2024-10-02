@@ -27,34 +27,34 @@ public class SpendingController {
         this.spendingService = spendingService;
     }
 
+    // @GetMapping
+    // public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false) LocalDate createdAtBefore,
+    //         @RequestParam(required = false) LocalDate createdAtAfter) {
+    //     return ResponseEntity.ok(spendingService.getAll(createdAtBefore, createdAtAfter));
+    // }
+
     @GetMapping
     public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false) LocalDate createdAtBefore,
-            @RequestParam(required = false) LocalDate createdAtAfter) {
-        return ResponseEntity.ok(spendingService.getAll(createdAtBefore, createdAtAfter));
-    }
-
-    @GetMapping("/user")
-    public ResponseEntity<List<Spending>> getAllByUser(@RequestParam(required = false) LocalDate createdAtBefore,
             @RequestParam(required = false) LocalDate createdAtAfter) {
         return ResponseEntity.ok(spendingService.getAllByUser(createdAtBefore, createdAtAfter));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Spending> get(@PathVariable Long id) {
-        return spendingService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    // @GetMapping("/{id}")
+    // public ResponseEntity<Spending> get(@PathVariable Long id) {
+    //     return spendingService.getById(id)
+    //             .map(ResponseEntity::ok)
+    //             .orElseGet(() -> ResponseEntity.notFound().build());
+    // }
 
-    @PostMapping
-    public ResponseEntity<Spending> create(@RequestBody Spending spending) {
-        final Spending created = spendingService.create(spending);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
+    // @PostMapping
+    // public ResponseEntity<Spending> create(@RequestBody Spending spending) {
+    //     final Spending created = spendingService.create(spending);
+    //     return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    // }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        spendingService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<Void> delete(@PathVariable Long id) {
+    //     spendingService.delete(id);
+    //     return ResponseEntity.noContent().build();
+    // }
 }

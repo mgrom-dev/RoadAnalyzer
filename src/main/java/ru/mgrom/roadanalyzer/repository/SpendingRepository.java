@@ -4,31 +4,30 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import ru.mgrom.roadanalyzer.model.Spending;
-import ru.mgrom.roadanalyzer.service.DatabaseSchemaService;
 
 @Repository
-public class SpendingRepository {
+public class SpendingRepository extends BaseRepository<Spending> implements GenericRepository<Spending> {
 
-    @Autowired
-    private EntityManager entityManager;
+    @Override
+    protected String getTableName() {
+        return "spending";
+    }
 
-    @Autowired
-    private DatabaseSchemaService databaseSchemaService;
+    @Override
+    protected Class<Spending> getEntityClass() {
+        return Spending.class;
+    }
 
     public List<Spending> findSpendingsByDateRange(LocalDate min, LocalDate max) {
-        // get scheme id for current user
-        String databaseIdentifier = databaseSchemaService.getDatabaseIdentifierFromSession();
-
         // execute query to the table in the needed schema
-        String sql = "SELECT * FROM " + databaseIdentifier + ".spending WHERE date BETWEEN :min AND :max";
-        Query query = entityManager.createNativeQuery(sql, Spending.class);
+        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + getTableName()
+                + " WHERE date BETWEEN :min AND :max";
+        Query query = createQuery(sql, Spending.class);
         query.setParameter("min", min);
         query.setParameter("max", max);
 
@@ -41,23 +40,26 @@ public class SpendingRepository {
         return spendings;
     }
 
+    @Override
     @Transactional
-    public Spending createSpending(Spending spending) {
-        String databaseIdentifier = databaseSchemaService.getDatabaseIdentifierFromSession();
-
-        String sql = "INSERT INTO " + databaseIdentifier
-                + ".spending (date, part_and_service_id, description, count, amount) " +
-                "VALUES (:date, :partAndServiceId, :description, :count, :amount)";
-
-        Query query = entityManager.createNativeQuery(sql);
+    public Spending save(Spending spending) {
+        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + getTableName()
+                + " (date, part_and_service_id, description, count, amount) VALUES (:date, :partAndServiceId, :description, :count, :amount)";
+        Query query = createQuery(sql);
         query.setParameter("date", spending.getDate());
         query.setParameter("partAndServiceId", spending.getPartAndServiceId());
         query.setParameter("description", spending.getDescription());
         query.setParameter("count", spending.getCount());
         query.setParameter("amount", spending.getAmount());
-
         query.executeUpdate();
 
-        return spending;
+        String selectSql = "SELECT * FROM " + getDatabaseIdentifier()
+                + "." + getTableName() + " WHERE part_and_service_id = :partAndServiceId ORDER BY id DESC LIMIT 1";
+        Query selectQuery = createQuery(selectSql, Spending.class);
+        selectQuery.setParameter("partAndServiceId", spending.getPartAndServiceId());
+
+        Spending createdSpending = (Spending) selectQuery.getSingleResult();
+
+        return createdSpending;
     }
 }

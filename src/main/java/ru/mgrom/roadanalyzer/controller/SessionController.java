@@ -1,8 +1,6 @@
 package ru.mgrom.roadanalyzer.controller;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,15 +109,14 @@ public class SessionController {
         });
 
         Long[] typeId = { 1L };
-        List<PartAndService> partAndServices = Stream
-                .of("Автобензин АИ-95", "Мойка машины", "Тормозные колодки передние комплект TRW GDB2108")
-                .map(description -> {
+        Stream.of("Автобензин АИ-95", "Мойка машины", "Тормозные колодки передние комплект TRW GDB2108")
+                .forEach(description -> {
                     PartAndService partAndService = new PartAndService();
                     partAndService.setDescription(description);
                     partAndService.setType(typeId[0]++);
-                    return partAndService;
-                }).collect(Collectors.toList());
-        partRepository.saveAll(partAndServices);
+                    partRepository.save(partAndService);
+                });
+
         Spending spending1 = new Spending();
         spending1.setDate(LocalDate.of(2024, 6, 16));
         spending1.setPartAndServiceId(1L);
@@ -136,8 +133,8 @@ public class SessionController {
         spending3.setPartAndServiceId(3L);
         spending3.setCount(1.0);
         spending3.setAmount(2400.0);
-        spendingRepository.createSpending(spending1);
-        spendingRepository.createSpending(spending2);
-        spendingRepository.createSpending(spending3);
+        spendingRepository.save(spending1);
+        spendingRepository.save(spending2);
+        spendingRepository.save(spending3);
     }
 }

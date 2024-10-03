@@ -3,21 +3,20 @@ package ru.mgrom.roadanalyzer.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * detailed expenses by date
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Spending {
-    @Id
-    Long id;
+public class Spending extends BaseEntity {
 
     private LocalDate date;
 

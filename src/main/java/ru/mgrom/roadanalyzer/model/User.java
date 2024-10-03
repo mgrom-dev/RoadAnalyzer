@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,19 +12,19 @@ import lombok.EqualsAndHashCode;
  * users web app
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
-    private Long id;
+public class User extends BaseEntity {
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password; // saved hashed password
+
+    @Column(name = "role", nullable = false)
+    private String role;
 
     @Column(name = "email", unique = true, nullable = false)
     private String email;

@@ -10,20 +10,14 @@ import ru.mgrom.roadanalyzer.model.ExpenseType;
 public class ExpenseTypeRepository extends BaseRepository<ExpenseType>
         implements GenericRepository<ExpenseType> {
 
-    @Override
-    protected String getTableName() {
-        return "expense_type";
-    }
-
-    @Override
-    protected Class<ExpenseType> getEntityClass() {
-        return ExpenseType.class;
+    public ExpenseTypeRepository() {
+        super(ExpenseType.class, "expense_type");
     }
 
     @Override
     @Transactional
     public ExpenseType save(ExpenseType expenseType) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + getTableName()
+        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
                 + " (description) VALUES (:description)";
         Query query = createQuery(sql);
         query.setParameter("description", expenseType.getDescription());

@@ -4,9 +4,6 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,14 +13,11 @@ import lombok.EqualsAndHashCode;
  * auto generated table by triggers
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "fuel")
-public class Fuel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
-    Long id;
-
+public class Fuel extends BaseEntity {
+    
     @Column(name = "spending_id")
     private Long spendingId;
 

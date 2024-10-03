@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "expense_type")
 public class ExpenseType extends BaseEntity {
+    
     @Column(name = "description", nullable = false)
     private String description;
 }

@@ -7,20 +7,13 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "sessions")
-public class Session {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
-    private Long id;
+public class Session extends BaseEntity {
 
     @Column(name = "session_id", unique = true, nullable = false)
     private String sessionId; // id session

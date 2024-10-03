@@ -36,7 +36,7 @@ public class SpendingController {
     @GetMapping
     public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false) LocalDate createdAtBefore,
             @RequestParam(required = false) LocalDate createdAtAfter) {
-        return ResponseEntity.ok(spendingService.getAllByUser(createdAtBefore, createdAtAfter));
+        return ResponseEntity.ok(spendingService.getAll(createdAtBefore, createdAtAfter));
     }
 
     // @GetMapping("/{id}")

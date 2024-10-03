@@ -11,19 +11,13 @@ import jakarta.persistence.Query;
 public class PartAndServiceRepository extends BaseRepository<PartAndService>
         implements GenericRepository<PartAndService> {
 
-    @Override
-    protected String getTableName() {
-        return "part_and_service";
-    }
-
-    @Override
-    protected Class<PartAndService> getEntityClass() {
-        return PartAndService.class;
+    public PartAndServiceRepository() {
+        super(PartAndService.class, "part_and_service");
     }
 
     @Transactional
     public PartAndService save(PartAndService partAndService) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + getTableName()
+        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
                 + "  (description, type) VALUES (:description, :type)";
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("description", partAndService.getDescription());

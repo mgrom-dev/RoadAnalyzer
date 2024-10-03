@@ -20,9 +20,18 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
 server:
   servlet:
     session:
       timeout: 30d  # time life session
       cookie:
         max-age: 30d  # time life cookies
+  error:
+    whitelabel:
+      enabled: false

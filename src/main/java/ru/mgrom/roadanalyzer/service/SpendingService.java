@@ -26,7 +26,7 @@ public class SpendingService {
     //     return spendingRepository.findByDateBetween(createdAtAfter, createdAtBefore);
     //}
 
-    public List<Spending> getAllByUser(LocalDate createdAtBefore, LocalDate createdAtAfter) {
+    public List<Spending> getAll(LocalDate createdAtBefore, LocalDate createdAtAfter) {
         createdAtBefore = createdAtBefore == null ? LocalDate.MIN : createdAtBefore;
         createdAtAfter = createdAtAfter == null ? LocalDate.MAX : createdAtAfter;
         return spendingRepository.findSpendingsByDateRange(createdAtAfter, createdAtBefore);

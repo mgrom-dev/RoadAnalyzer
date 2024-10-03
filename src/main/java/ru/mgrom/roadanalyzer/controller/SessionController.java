@@ -24,7 +24,7 @@ import ru.mgrom.roadanalyzer.dto.SessionResponse;
 
 @RestController
 public class SessionController {
-    private static int userNamePrefix = 1;
+    private static int userNamePrefix = 2;
     private static int emailPrefix = 1;
 
     @Autowired
@@ -48,10 +48,11 @@ public class SessionController {
         if (existingSession == null) {
             // Сессия не найдена, создаем нового пользователя
             User newUser = new User();
-            newUser.setUsername("defaultUser" + userNamePrefix++); // Укажите логин по умолчанию или получите его из
+            newUser.setUsername("defaultUser_" + userNamePrefix++); // Укажите логин по умолчанию или получите его из
                                                                    // запроса
             newUser.setPassword("defaultPassword"); // Укажите пароль по умолчанию или получите его из запроса
-            newUser.setEmail("user@example.com" + emailPrefix++); // Укажите email по умолчанию или получите его из
+            newUser.setRole("user");
+            newUser.setEmail("user@example.com_" + emailPrefix++); // Укажите email по умолчанию или получите его из
                                                                   // запроса
             newUser.setDatabaseIdentifier("user_db_" + sessionId); // Уникальный идентификатор базы данных
 
@@ -94,7 +95,7 @@ public class SessionController {
 
     // create test data for developing
     private void testData() {
-        if (userNamePrefix != 2) {
+        if (emailPrefix != 2) {
             return;
         }
 

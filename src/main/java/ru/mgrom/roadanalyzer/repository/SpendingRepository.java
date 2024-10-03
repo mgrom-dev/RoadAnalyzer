@@ -13,19 +13,13 @@ import ru.mgrom.roadanalyzer.model.Spending;
 @Repository
 public class SpendingRepository extends BaseRepository<Spending> implements GenericRepository<Spending> {
 
-    @Override
-    protected String getTableName() {
-        return "spending";
-    }
-
-    @Override
-    protected Class<Spending> getEntityClass() {
-        return Spending.class;
+    public SpendingRepository() {
+        super(Spending.class, "spending");
     }
 
     public List<Spending> findSpendingsByDateRange(LocalDate min, LocalDate max) {
         // execute query to the table in the needed schema
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + getTableName()
+        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName
                 + " WHERE date BETWEEN :min AND :max";
         Query query = createQuery(sql, Spending.class);
         query.setParameter("min", min);
@@ -43,7 +37,7 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
     @Override
     @Transactional
     public Spending save(Spending spending) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + getTableName()
+        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
                 + " (date, part_and_service_id, description, count, amount) VALUES (:date, :partAndServiceId, :description, :count, :amount)";
         Query query = createQuery(sql);
         query.setParameter("date", spending.getDate());
@@ -54,7 +48,7 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
         query.executeUpdate();
 
         String selectSql = "SELECT * FROM " + getDatabaseIdentifier()
-                + "." + getTableName() + " WHERE part_and_service_id = :partAndServiceId ORDER BY id DESC LIMIT 1";
+                + "." + tableName + " WHERE part_and_service_id = :partAndServiceId ORDER BY id DESC LIMIT 1";
         Query selectQuery = createQuery(selectSql, Spending.class);
         selectQuery.setParameter("partAndServiceId", spending.getPartAndServiceId());
 

@@ -21,6 +21,15 @@ public abstract class BaseRepository<T> {
     @Autowired
     protected DatabaseSchemaService databaseSchemaService;
 
+    protected final Class<T> entityClass;
+
+    protected final String tableName;
+
+    public BaseRepository(Class<T> entityClass, String tableName) {
+        this.entityClass = entityClass;
+        this.tableName = tableName;
+    }
+
     protected String getDatabaseIdentifier() {
         return databaseSchemaService.getDatabaseIdentifierFromSession();
     }
@@ -33,14 +42,11 @@ public abstract class BaseRepository<T> {
         return entityManager.createNativeQuery(sql, resultClass);
     }
 
-    protected abstract String getTableName();
-
-    protected abstract Class<T> getEntityClass();
-
     @SuppressWarnings("unchecked")
     public Optional<T> findById(Long id) {
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + getTableName() + " WHERE id = :id LIMIT 1";
-        Query query = createQuery(sql, getEntityClass());
+        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName + " WHERE id = :id LIMIT 1";
+        
+        Query query = createQuery(sql, entityClass);
         query.setParameter("id", id);
 
         T entity = null;
@@ -55,8 +61,8 @@ public abstract class BaseRepository<T> {
 
     @SuppressWarnings("unchecked")
     public List<T> findAll() {
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + getTableName();
-        Query query = createQuery(sql, getEntityClass());
+        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName;
+        Query query = createQuery(sql, entityClass);
 
         List<T> entities = new ArrayList<>();
         for (Object obj : query.getResultList()) {
@@ -68,7 +74,7 @@ public abstract class BaseRepository<T> {
 
     @Transactional
     public void deleteById(Long id) {
-        String sql = "DELETE FROM " + getDatabaseIdentifier() + "." + getTableName() + " WHERE id = :id";
+        String sql = "DELETE FROM " + getDatabaseIdentifier() + "." + tableName + " WHERE id = :id";
         Query query = createQuery(sql);
         query.setParameter("id", id);
 

@@ -32,6 +32,3 @@ server:
       timeout: 30d  # time life session
       cookie:
         max-age: 30d  # time life cookies
-  error:
-    whitelabel:
-      enabled: false

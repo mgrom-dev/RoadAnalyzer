@@ -1,31 +1,39 @@
 package ru.mgrom.roadanalyzer.exception;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import ru.mgrom.roadanalyzer.service.CookieUtils;
 
 @ControllerAdvice
 public class HttpStatusException {
 
-    @ExceptionHandler(NoSuchElementException.class)
+    @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFound() {
+    public String handleNotFound(NoResourceFoundException ex, HttpServletRequest request) {
+        consoleLogSystemInformation(ex, request);
         return "404"; // return 404 error page
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNoHandlerFound() {
-        return "404"; // Возвращает страницу 404
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public String methodNotAllowed(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        consoleLogSystemInformation(ex, request);
+        return "405";
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleAllOtherExceptions() {
-        return "404"; // Возвращает страницу с сообщением об ошибке
+    private void consoleLogSystemInformation(Exception ex, HttpServletRequest request) {
+        System.out.println("Requested URL: " + request.getRequestURL());
+        System.out.println("HTTP Method: " + request.getMethod());
+        System.out.println("Query Parameters: " + request.getQueryString());
+        System.out.println("Session id: " + CookieUtils.getSessionId(request));
+        CookieUtils.getUser(request).ifPresentOrElse(
+                user -> System.out.println(user),
+                () -> System.out.println("user for this session not found"));
     }
 }

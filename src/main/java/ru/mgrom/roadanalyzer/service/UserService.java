@@ -13,15 +13,27 @@ import ru.mgrom.roadanalyzer.repository.UserRepository;
 
 @Service
 public class UserService {
+
+    public static enum AuthStatus {
+        SUCCESS,
+        USER_NOT_FOUND,
+        PASSWORD_INCORRECT,
+    }
+
     @Autowired
     UserRepository userRepository;
 
     @Autowired
     SessionRepository sessionRepository;
 
-    public void authorize(String login, String password, HttpServletRequest request) {
+    public AuthStatus authorize(String login, String password, HttpServletRequest request) {
         User user = userRepository.findByUsername(login);
-        if (user != null && user.getPassword().equals(password)) {
+        AuthStatus authStatus = AuthStatus.SUCCESS;
+        if (user == null) {
+            authStatus = AuthStatus.USER_NOT_FOUND;
+        } else if (!checkPassword(password, user.getPassword())) {
+            authStatus = AuthStatus.PASSWORD_INCORRECT;
+        } else {
             String sessionId = SessionUtils.getSessionId(request);
             if (sessionId != null) {
                 Session session = sessionRepository.findBySessionId(sessionId);
@@ -35,11 +47,8 @@ public class UserService {
                 session.setLastAccessedAt(LocalDateTime.now());
                 sessionRepository.save(session);
             }
-        } else if (user == null) {
-            System.out.println("login not found");
-        } else {
-            System.out.println("password incorrect");
         }
+        return authStatus;
     }
 
     private boolean checkPassword(String rawPassword, String encodedPassword) {

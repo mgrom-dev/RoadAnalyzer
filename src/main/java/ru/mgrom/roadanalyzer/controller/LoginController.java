@@ -1,13 +1,15 @@
 package ru.mgrom.roadanalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.servlet.http.HttpServletRequest;
 import ru.mgrom.roadanalyzer.service.UserService;
+import ru.mgrom.roadanalyzer.service.UserService.AuthStatus;
 
 @Controller
 public class LoginController {
@@ -15,16 +17,25 @@ public class LoginController {
     UserService userService;
 
     @PostMapping("/auth")
-    public RedirectView auth(@RequestParam String login, @RequestParam String pswd,
+    public ResponseEntity<?> auth(@RequestParam String login, @RequestParam String pswd,
             @RequestParam(required = false) String email, HttpServletRequest request) {
 
         if (email != null && !email.isEmpty()) {
             // Логика регистрации
-            System.out.println("Registation: Username: " + login + ", Password: " + pswd + ", Email: " + email);
+            System.out.println("Registration: Username: " + login + ", Password: " + pswd + ", Email: " + email);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно зарегистрирован.");
         } else {
-            userService.authorize(login, pswd, request);
-            System.out.println("Authorization: Username: " + login + ", Password: " + pswd);
+            AuthStatus status = userService.authorize(login, pswd, request);
+
+            return switch (status) {
+                case SUCCESS -> ResponseEntity.status(HttpStatus.FOUND).header("Location", "/").build();
+                case PASSWORD_INCORRECT -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("{\"error\": \"Неверный логин или пароль.\"}");
+                case USER_NOT_FOUND -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("{\"error\": \"Пользователь не найден.\"}");
+                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("{\"error\": \"Произошла ошибка. Попробуйте позже.\"}");
+            };
         }
-        return new RedirectView("/");
     }
 }

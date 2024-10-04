@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/authForm.css">
-
+    
+    <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/chart.umd.js"></script>
     <script src="/js/utils.js"></script>
 </head>
@@ -15,7 +16,8 @@
 <body>
     <div id="webcrumbs">
 
-        <div th:replace="~{authForm}"></div>
+        <div th:replace="~{authForm :: authFormFragment}"></div>
+        <div th:replace="~{authForm :: settingsFormFragment}"></div>
 
         <div class="flex justify-center items-center min-h-screen bg-neutral-50">
             <div class="w-[1200px] min-h-[800px] bg-white rounded-lg shadow-lg p-8">
@@ -34,7 +36,8 @@
                         <a href="#" class="text-primary" onclick="loadContent('components')">Узлы автомобиля</a>
                         <!-- Кнопка для показа формы авторизации -->
                     </nav>
-                    <button id="showAuthForm" th:text="${username != null ? 'Профиль ' + username : 'Войти'}"></button>
+                    <button id="showAuthForm" th:if="${!isActiveUser}"></button>
+                    <button id="showSettingsButton" th:if="${isActiveUser}">Профиль</button>
                 </header>
 
                 <section class="flex flex-wrap gap-8">

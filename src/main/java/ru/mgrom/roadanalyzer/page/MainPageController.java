@@ -14,9 +14,7 @@ public class MainPageController {
     @GetMapping("/")
     public String home(HttpServletRequest request, Model model) {
         User user = SessionUtils.getUser(request);
-        if (user.isActive()) {
-            model.addAttribute("username", user.getUsername());
-        }
+        model.addAttribute("isActiveUser", user.isActive());
         return "index"; // return template index.html
     }
 

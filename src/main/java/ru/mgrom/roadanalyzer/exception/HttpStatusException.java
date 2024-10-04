@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ru.mgrom.roadanalyzer.service.CookieUtils;
+import ru.mgrom.roadanalyzer.service.SessionUtils;
 
 @ControllerAdvice
 public class HttpStatusException {
@@ -31,9 +31,7 @@ public class HttpStatusException {
         System.out.println("Requested URL: " + request.getRequestURL());
         System.out.println("HTTP Method: " + request.getMethod());
         System.out.println("Query Parameters: " + request.getQueryString());
-        System.out.println("Session id: " + CookieUtils.getSessionId(request));
-        CookieUtils.getUser(request).ifPresentOrElse(
-                user -> System.out.println(user),
-                () -> System.out.println("user for this session not found"));
+        System.out.println("Session id: " + SessionUtils.getSessionId(request));
+        System.out.println(SessionUtils.getUser(request));
     }
 }

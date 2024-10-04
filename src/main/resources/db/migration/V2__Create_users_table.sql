@@ -10,7 +10,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     database_identifier VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    is_active BOOLEAN NOT NULL
+    is_active BOOLEAN NOT NULL DEFAULT false
 );
 
 -- Обновляем существующие записи для использования последовательности

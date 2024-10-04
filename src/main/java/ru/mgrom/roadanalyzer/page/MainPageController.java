@@ -1,13 +1,22 @@
 package ru.mgrom.roadanalyzer.page;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import jakarta.servlet.http.HttpServletRequest;
+import ru.mgrom.roadanalyzer.model.User;
+import ru.mgrom.roadanalyzer.service.SessionUtils;
 
 @Controller
 public class MainPageController {
 
     @GetMapping("/")
-    public String home() {
+    public String home(HttpServletRequest request, Model model) {
+        User user = SessionUtils.getUser(request);
+        if (user.isActive()) {
+            model.addAttribute("username", user.getUsername());
+        }
         return "index"; // return template index.html
     }
 

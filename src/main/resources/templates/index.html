@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/authForm.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/chart.umd.js"></script>
     <script src="/js/utils.js"></script>
 </head>
 
@@ -34,7 +34,7 @@
                         <a href="#" class="text-primary" onclick="loadContent('components')">Узлы автомобиля</a>
                         <!-- Кнопка для показа формы авторизации -->
                     </nav>
-                    <button id="showAuthForm"></button>
+                    <button id="showAuthForm" th:text="${username != null ? 'Профиль ' + username : 'Войти'}"></button>
                 </header>
 
                 <section class="flex flex-wrap gap-8">

@@ -16,15 +16,19 @@ public class PartAndServiceRepository extends BaseRepository<PartAndService>
     }
 
     @Transactional
-    public PartAndService save(PartAndService partAndService) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
-                + "  (description, type) VALUES (:description, :type)";
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("description", partAndService.getDescription());
-        query.setParameter("type", partAndService.getType());
-
-        query.executeUpdate();
-
-        return partAndService;
+    public boolean save(PartAndService partAndService, String databaseIdentifier) {
+        boolean isSaved = false;
+        try {
+            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
+                    + "  (description, type) VALUES (:description, :type)";
+            Query query = entityManager.createNativeQuery(sql);
+            query.setParameter("description", partAndService.getDescription());
+            query.setParameter("type", partAndService.getType());
+            query.executeUpdate();
+            isSaved = true;
+        } catch (Exception e) {
+            System.out.println("error PartAndService: " + e.getMessage());
+        }
+        return isSaved;
     }
 }

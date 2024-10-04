@@ -16,20 +16,18 @@ public class ExpenseTypeRepository extends BaseRepository<ExpenseType>
 
     @Override
     @Transactional
-    public ExpenseType save(ExpenseType expenseType) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
-                + " (description) VALUES (:description)";
-        Query query = createQuery(sql);
-        query.setParameter("description", expenseType.getDescription());
-        query.executeUpdate();
-
-        // get created entity
-        String selectSql = "SELECT * FROM " + getDatabaseIdentifier()
-                + ".expense_type WHERE description = :description ORDER BY id DESC LIMIT 1";
-        Query selectQuery = entityManager.createNativeQuery(selectSql, ExpenseType.class);
-        selectQuery.setParameter("description", expenseType.getDescription());
-        ExpenseType createdExpenseType = (ExpenseType) selectQuery.getSingleResult();
-
-        return createdExpenseType;
+    public boolean save(ExpenseType expenseType, String databaseIdentifier) {
+        boolean isSaved = false;
+        try {
+            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
+                    + " (description) VALUES (:description)";
+            Query query = createQuery(sql);
+            query.setParameter("description", expenseType.getDescription());
+            query.executeUpdate();
+            isSaved = true;
+        } catch (Exception e) {
+            System.out.println("error ExpenseType: " + e.getMessage());
+        }
+        return isSaved;
     }
 }

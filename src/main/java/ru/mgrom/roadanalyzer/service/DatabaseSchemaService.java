@@ -1,29 +1,14 @@
 package ru.mgrom.roadanalyzer.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import jakarta.persistence.EntityManager;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import ru.mgrom.roadanalyzer.AppConfig;
-import ru.mgrom.roadanalyzer.dto.SessionResponse;
 
 @Service
 public class DatabaseSchemaService {
 
     private final EntityManager entityManager;
-
-    @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     public DatabaseSchemaService(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -35,27 +20,6 @@ public class DatabaseSchemaService {
         entityManager.createNativeQuery(createSchemaSql).executeUpdate();
 
         createRequiredTables(schemaName);
-    }
-
-    public String getDatabaseIdentifierFromSession() {
-        // get current headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Cookie", request.getHeader("Cookie")); // get cookies session
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        // execute request with headers
-        ResponseEntity<SessionResponse> response = restTemplate.exchange(AppConfig.SESSION_INFO_URL,
-                HttpMethod.GET, entity,
-                SessionResponse.class);
-
-        SessionResponse sessionInfo = response.getBody();
-
-        if (sessionInfo == null || sessionInfo.getDatabaseId() == null) {
-            throw new RuntimeException("Failed to get session information.");
-        }
-
-        return sessionInfo.getDatabaseId();
     }
 
     private void createRequiredTables(String schemaName) {

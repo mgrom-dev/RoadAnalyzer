@@ -17,9 +17,9 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
         super(Spending.class, "spending");
     }
 
-    public List<Spending> findSpendingsByDateRange(LocalDate min, LocalDate max) {
+    public List<Spending> findSpendingsByDateRange(LocalDate min, LocalDate max, String databaseIdentifier) {
         // execute query to the table in the needed schema
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName
+        String sql = "SELECT * FROM " + databaseIdentifier + "." + tableName
                 + " WHERE date BETWEEN :min AND :max";
         Query query = createQuery(sql, Spending.class);
         query.setParameter("min", min);
@@ -36,24 +36,22 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
 
     @Override
     @Transactional
-    public Spending save(Spending spending) {
-        String sql = "INSERT INTO " + getDatabaseIdentifier() + "." + tableName
-                + " (date, part_and_service_id, description, count, amount) VALUES (:date, :partAndServiceId, :description, :count, :amount)";
-        Query query = createQuery(sql);
-        query.setParameter("date", spending.getDate());
-        query.setParameter("partAndServiceId", spending.getPartAndServiceId());
-        query.setParameter("description", spending.getDescription());
-        query.setParameter("count", spending.getCount());
-        query.setParameter("amount", spending.getAmount());
-        query.executeUpdate();
-
-        String selectSql = "SELECT * FROM " + getDatabaseIdentifier()
-                + "." + tableName + " WHERE part_and_service_id = :partAndServiceId ORDER BY id DESC LIMIT 1";
-        Query selectQuery = createQuery(selectSql, Spending.class);
-        selectQuery.setParameter("partAndServiceId", spending.getPartAndServiceId());
-
-        Spending createdSpending = (Spending) selectQuery.getSingleResult();
-
-        return createdSpending;
+    public boolean save(Spending spending, String databaseIdentifier) {
+        boolean isSaved = false;
+        try {
+            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
+                    + " (date, part_and_service_id, description, count, amount) VALUES (:date, :partAndServiceId, :description, :count, :amount)";
+            Query query = createQuery(sql);
+            query.setParameter("date", spending.getDate());
+            query.setParameter("partAndServiceId", spending.getPartAndServiceId());
+            query.setParameter("description", spending.getDescription());
+            query.setParameter("count", spending.getCount());
+            query.setParameter("amount", spending.getAmount());
+            query.executeUpdate();
+            isSaved = true;
+        } catch (Exception e) {
+            System.out.println("error PartAndService: " + e.getMessage());
+        }
+        return isSaved;
     }
 }

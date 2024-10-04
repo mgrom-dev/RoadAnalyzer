@@ -40,6 +40,6 @@ public class User extends BaseEntity {
 
     public User() {
         this.createdAt = LocalDateTime.now();
-        this.isActive = true; // default user is active
+        this.isActive = false; // default user is active
     }
 }

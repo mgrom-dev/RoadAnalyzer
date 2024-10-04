@@ -31,6 +31,7 @@ public class Session extends BaseEntity {
     private boolean isActive; // status active session
 
     public Session() {
+        this.userId = 0L;
         this.createdAt = LocalDateTime.now();
         this.isActive = true; // default session is active
         this.lastAccessedAt = LocalDateTime.now(); // set date create current time

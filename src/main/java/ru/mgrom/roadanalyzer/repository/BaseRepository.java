@@ -30,10 +30,6 @@ public abstract class BaseRepository<T> {
         this.tableName = tableName;
     }
 
-    protected String getDatabaseIdentifier() {
-        return databaseSchemaService.getDatabaseIdentifierFromSession();
-    }
-
     protected Query createQuery(String sql) {
         return entityManager.createNativeQuery(sql);
     }
@@ -43,9 +39,9 @@ public abstract class BaseRepository<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<T> findById(Long id) {
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName + " WHERE id = :id LIMIT 1";
-        
+    public Optional<T> findById(Long id, String databaseIdentifier) {
+        String sql = "SELECT * FROM " + databaseIdentifier + "." + tableName + " WHERE id = :id LIMIT 1";
+
         Query query = createQuery(sql, entityClass);
         query.setParameter("id", id);
 
@@ -60,8 +56,8 @@ public abstract class BaseRepository<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<T> findAll() {
-        String sql = "SELECT * FROM " + getDatabaseIdentifier() + "." + tableName;
+    public List<T> findAll(String databaseIdentifier) {
+        String sql = "SELECT * FROM " + databaseIdentifier + "." + tableName;
         Query query = createQuery(sql, entityClass);
 
         List<T> entities = new ArrayList<>();
@@ -73,8 +69,8 @@ public abstract class BaseRepository<T> {
     }
 
     @Transactional
-    public void deleteById(Long id) {
-        String sql = "DELETE FROM " + getDatabaseIdentifier() + "." + tableName + " WHERE id = :id";
+    public void deleteById(Long id, String databaseIdentifier) {
+        String sql = "DELETE FROM " + databaseIdentifier + "." + tableName + " WHERE id = :id";
         Query query = createQuery(sql);
         query.setParameter("id", id);
 
@@ -82,7 +78,7 @@ public abstract class BaseRepository<T> {
     }
 
     @Transactional
-    public void delete(T entity) {
-        deleteById(((BaseEntity) entity).getId());
+    public void delete(T entity, String databaseIdentifier) {
+        deleteById(((BaseEntity) entity).getId(), databaseIdentifier);
     }
 }

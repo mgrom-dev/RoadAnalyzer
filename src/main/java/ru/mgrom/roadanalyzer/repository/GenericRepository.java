@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GenericRepository<T> {
-    T save(T entity);
+    boolean save(T entity, String databaseIdentifier);
 
-    Optional<T> findById(Long id);
+    Optional<T> findById(Long id, String databaseIdentifier);
 
-    List<T> findAll();
+    List<T> findAll(String databaseIdentifier);
 
-    void deleteById(Long id);
+    void deleteById(Long id, String databaseIdentifier);
 
-    void delete(T entity);
+    void delete(T entity, String databaseIdentifier);
 }

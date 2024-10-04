@@ -26,10 +26,10 @@ public class SpendingService {
     //     return spendingRepository.findByDateBetween(createdAtAfter, createdAtBefore);
     //}
 
-    public List<Spending> getAll(LocalDate createdAtBefore, LocalDate createdAtAfter) {
+    public List<Spending> getAll(LocalDate createdAtBefore, LocalDate createdAtAfter, String databaseIdentifier) {
         createdAtBefore = createdAtBefore == null ? LocalDate.MIN : createdAtBefore;
         createdAtAfter = createdAtAfter == null ? LocalDate.MAX : createdAtAfter;
-        return spendingRepository.findSpendingsByDateRange(createdAtAfter, createdAtBefore);
+        return spendingRepository.findSpendingsByDateRange(createdAtAfter, createdAtBefore, databaseIdentifier);
     }
 
     // public Spending create(Spending spending) {

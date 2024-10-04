@@ -16,85 +16,34 @@ import ru.mgrom.roadanalyzer.model.Spending;
 import ru.mgrom.roadanalyzer.model.User;
 import ru.mgrom.roadanalyzer.repository.ExpenseTypeRepository;
 import ru.mgrom.roadanalyzer.repository.PartAndServiceRepository;
-import ru.mgrom.roadanalyzer.repository.SessionRepository;
 import ru.mgrom.roadanalyzer.repository.SpendingRepository;
-import ru.mgrom.roadanalyzer.repository.UserRepository;
-import ru.mgrom.roadanalyzer.service.DatabaseSchemaService;
+import ru.mgrom.roadanalyzer.service.SessionUtils;
 import ru.mgrom.roadanalyzer.dto.SessionResponse;
 
 @RestController
 public class SessionController {
-    private static int userNamePrefix = 2;
     private static int emailPrefix = 1;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SessionRepository sessionRepository;
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private DatabaseSchemaService databaseSchemaService;
-
     @GetMapping("/session-info")
     public SessionResponse startSession(HttpServletRequest request) {
-        String sessionId = request.getSession().getId(); // Получаем ID сессии
+        User user = SessionUtils.getUser(request);
+        Session session = SessionUtils.getSession(request);
 
-        // Проверяем, существует ли сессия в базе данных
-        Session existingSession = sessionRepository.findBySessionId(sessionId);
-        if (existingSession == null) {
-            // Сессия не найдена, создаем нового пользователя
-            User newUser = new User();
-            newUser.setUsername("defaultUser_" + userNamePrefix++); // Укажите логин по умолчанию или получите его из
-                                                                   // запроса
-            newUser.setPassword("defaultPassword"); // Укажите пароль по умолчанию или получите его из запроса
-            newUser.setRole("user");
-            newUser.setEmail("user@example.com_" + emailPrefix++); // Укажите email по умолчанию или получите его из
-                                                                  // запроса
-            newUser.setDatabaseIdentifier("user_db_" + sessionId); // Уникальный идентификатор базы данных
+        return new SessionResponse(
+                user.getId(),
+                session.getSessionId(),
+                user.getEmail(),
+                user.getDatabaseIdentifier(),
+                user.getCreatedAt(),
+                user.isActive());
 
-            userRepository.save(newUser); // Сохраняем пользователя в базе данных
-
-            // Создаем схему, если она не существует
-            databaseSchemaService.createSchemaIfNotExists(newUser.getDatabaseIdentifier());
-
-            // Создаем новую запись сессии
-            Session newSession = new Session();
-            newSession.setSessionId(sessionId);
-            newSession.setUserId(newUser.getId()); // Сохраняем ID нового пользователя
-            sessionRepository.save(newSession); // Сохраняем сессию в базе данных
-
-            testData();
-
-            return new SessionResponse(
-                    newUser.getId(),
-                    sessionId,
-                    newUser.getEmail(),
-                    newUser.getDatabaseIdentifier(),
-                    newSession.getCreatedAt(),
-                    newSession.isActive());
-        } else {
-            // Если сессия уже существует, возвращаем информацию о ней
-            User existingUser = userRepository.findById(existingSession.getUserId()).orElse(null);
-            if (existingUser != null) {
-                return new SessionResponse(
-                        existingUser.getId(),
-                        existingSession.getSessionId(),
-                        existingUser.getEmail(),
-                        existingUser.getDatabaseIdentifier(),
-                        existingSession.getCreatedAt(),
-                        existingSession.isActive());
-            } else {
-                throw new RuntimeException("Пользователь не найден для существующей сессии.");
-            }
-        }
     }
 
     // create test data for developing
-    private void testData() {
+    private void testData(String databaseIdentifier) {
         if (emailPrefix != 2) {
             return;
         }
@@ -106,7 +55,7 @@ public class SessionController {
         Stream.of("топливо", "услуги", "запчасти").forEach(description -> {
             ExpenseType expenseType = new ExpenseType();
             expenseType.setDescription(description);
-            expTypeRepository.save(expenseType);
+            expTypeRepository.save(expenseType, databaseIdentifier);
         });
 
         Long[] typeId = { 1L };
@@ -115,7 +64,7 @@ public class SessionController {
                     PartAndService partAndService = new PartAndService();
                     partAndService.setDescription(description);
                     partAndService.setType(typeId[0]++);
-                    partRepository.save(partAndService);
+                    partRepository.save(partAndService, databaseIdentifier);
                 });
 
         Spending spending1 = new Spending();
@@ -134,8 +83,8 @@ public class SessionController {
         spending3.setPartAndServiceId(3L);
         spending3.setCount(1.0);
         spending3.setAmount(2400.0);
-        spendingRepository.save(spending1);
-        spendingRepository.save(spending2);
-        spendingRepository.save(spending3);
+        spendingRepository.save(spending1, databaseIdentifier);
+        spendingRepository.save(spending2, databaseIdentifier);
+        spendingRepository.save(spending3, databaseIdentifier);
     }
 }

@@ -7,16 +7,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * description of expenses [nomenclature list]
+ * type of expense (e.g. fuel, services, spare parts) [type expense list]
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "part_and_service")
-public class PartAndService extends BaseEntity {
+@Table(name = "expense_type")
+public class ExpenseType extends BaseEntity {
     
     @Column(name = "description", nullable = false)
     private String description;
-
-    private Long type; // table expense_type
 }

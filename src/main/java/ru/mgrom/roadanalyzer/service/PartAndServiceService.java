@@ -16,24 +16,24 @@ public class PartAndServiceService {
         this.partAndServiceRepository = partAndServiceRepository;
     }
 
-    public Optional<PartAndService> getById(Long id) {
-        return partAndServiceRepository.findById(id);
+    public Optional<PartAndService> getById(Long id, String databaseIdentifier) {
+        return partAndServiceRepository.findById(id, databaseIdentifier);
     }
 
-    public List<PartAndService> getAll() {
-        return partAndServiceRepository.findAll();
+    public List<PartAndService> getAll(String databaseIdentifier) {
+        return partAndServiceRepository.findAll(databaseIdentifier);
     }
 
-    public PartAndService create(PartAndService partAndService) {
-        return partAndServiceRepository.save(partAndService);
+    public boolean create(PartAndService partAndService, String databaseIdentifier) {
+        return partAndServiceRepository.save(partAndService, databaseIdentifier);
     }
 
-    public void delete(PartAndService partAndService) {
-        partAndServiceRepository.delete(partAndService);
+    public void delete(PartAndService partAndService, String databaseIdentifier) {
+        partAndServiceRepository.delete(partAndService, databaseIdentifier);
     }
 
-    public Optional<PartAndService> update(Long id, PartAndService partAndService) {
+    public boolean update(Long id, PartAndService partAndService, String databaseIdentifier) {
         partAndService.setId(id);
-        return Optional.of(partAndServiceRepository.save(partAndService));
+        return partAndServiceRepository.save(partAndService, databaseIdentifier);
     }
 }

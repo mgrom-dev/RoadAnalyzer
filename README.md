@@ -37,7 +37,7 @@ separate database for each user
 | 6  | запчасти б/у      |
 
 **Info**
-| id | key                | value      |
+| id | key_info           | value_info |
 |----|--------------------|------------|
 | 1  | дата выпуска:      | 25.01.2023 |
 | 2  | стоимость покупки: | 600000     |
@@ -149,3 +149,9 @@ after registration, this table is bound to the current user.
 when authorizing, a connection to an existing database is made and the client works with it.
 
 ## Prootype frontend
+
+
+## links
+
+https://tools.webcrumbs.org/frontend-ai
+https://www.deepl.com/ru

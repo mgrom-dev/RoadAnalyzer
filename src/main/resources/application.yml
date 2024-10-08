@@ -19,6 +19,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+    placeholders:
+      proto_user_db: admin_db
 
 logging:
   level:

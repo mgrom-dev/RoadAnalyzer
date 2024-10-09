@@ -44,3 +44,11 @@ CREATE TABLE IF NOT EXISTS
         count DOUBLE,
         amount DOUBLE
     );
+
+-- default data
+INSERT INTO
+    ${proto_user_db}.expense_type (description)
+VALUES
+    ('топливо'),
+    ('услуги'),
+    ('запчасти');

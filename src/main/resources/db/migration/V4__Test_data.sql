@@ -1,12 +1,5 @@
 -- start test data for developing
 INSERT INTO
-    admin_db.expense_type (description)
-VALUES
-    ('топливо'),
-    ('услуги'),
-    ('запчасти');
-
-INSERT INTO
     admin_db.part_and_service (description, type)
 VALUES
     ('Автобензин АИ-95', 1),

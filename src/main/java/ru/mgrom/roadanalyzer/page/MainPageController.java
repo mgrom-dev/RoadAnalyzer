@@ -32,4 +32,9 @@ public class MainPageController {
     public String actions() {
         return "actions";
     }
+
+    @GetMapping("/expenses")
+    public String expenses() {
+        return "expenses";
+    }
 }

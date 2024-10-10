@@ -1,39 +1,24 @@
-async function fetchExpenses() {
-    const response = await fetch('/api/spending');
-    const expenses = await response.json();
-    return expenses;
-}
-
-function fetchExpensesSync() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/spending', false); // Установите false для синхронного запроса
-    xhr.send();
-
-    if (xhr.status === 200) {
-        return JSON.parse(xhr.responseText); // Возвращаем распарсенные данные
-    } else {
-        console.error('Ошибка загрузки данных:', xhr.statusText);
-        return []; // Возвращаем пустой массив в случае ошибки
-    }
-}
-
 function fetchSpendingData(startDate, endDate) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `api/spending/full?createdAtAfter=${startDate}&createdAtBefore=${endDate}`, false);
-    xhr.send();
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `api/spending/full?createdAtAfter=${startDate}&createdAtBefore=${endDate}`, true); // true для асинхронного вызова
 
-    if (xhr.status === 200) {
-        return JSON.parse(xhr.responseText);
-    } else {
-        console.error('Ошибка загрузки данных:', xhr.statusText);
-        return []; // return empty array
-    }
-}
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                resolve(JSON.parse(xhr.responseText));
+            } else {
+                console.error('Ошибка загрузки данных:', xhr.statusText);
+                reject(new Error(`Ошибка: ${xhr.statusText}`)); // отклоняем промис при ошибке
+            }
+        };
 
-function calculateSumByPartType(spendings, partType) {
-    return spendings
-        .filter(spending => spending.partType === partType)
-        .reduce((acc, spending) => acc + spending.amount, 0);
+        xhr.onerror = function () {
+            console.error('Ошибка сети');
+            reject(new Error('Ошибка сети')); // отклоняем промис при сетевой ошибке
+        };
+
+        xhr.send();
+    });
 }
 
 function formatCurrency(amount) {

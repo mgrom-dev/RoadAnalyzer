@@ -2,7 +2,7 @@
 <div class="grid grid-cols-3 gap-6">
     <div class="p-4 bg-neutral-200 rounded-md">
         <h3 class="text-xl">Топливо</h3>
-        <p class="text-lg">$5000 в этом году</p>
+        <p class="text-lg" id="fuel-sum">0₽ в этом году</p>
     </div>
     <div class="p-4 bg-neutral-200 rounded-md">
         <h3 class="text-xl">Запчасти</h3>
@@ -59,6 +59,15 @@
         // Инициализация графика
         new Chart(document.getElementById('expensesChart'), config);
     }
+
+    const currentYear = new Date().getFullYear();
+    const startOfYear = `${currentYear}-01-01`;
+    const endOfYear = `${currentYear}-12-31`;
+
+    // Получаем данные о расходах
+    const spendings = fetchSpendingData(startOfYear, endOfYear);
+    const fuelSum = calculateSumByPartType(spendings, 1);
+    $('#fuel-sum').html(`${formatCurrency(fuelSum)} в этом году`);
 
     const expenses = fetchExpensesSync();
     updateExpensesChart(expenses);

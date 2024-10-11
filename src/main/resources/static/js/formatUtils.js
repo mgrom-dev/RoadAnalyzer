@@ -12,16 +12,30 @@ function formatNumber(num, decimalPlaces) {
         return '';
     }
 
-    // round the decimal fraction to the specified precision
     const roundedNum = Number(num).toFixed(decimalPlaces);
-    // We divide the whole and fractional parts
+
+    // get fract and intefer part
     const [integerPart, fractionalPart] = roundedNum.split('.');
-    // We format the whole part with division by digits
+
+    // format integer part with group digit
     const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    // If the fractional part is empty, we return only the whole part
+
+    // if fract part is empty, or equal 0, then return only integer part
     if (!fractionalPart || parseFloat(fractionalPart) === 0) {
         return formattedInteger;
     }
 
-    return `${formattedInteger},${fractionalPart}`;
+    // remove left zeros in fract part
+    const trimmedFractionalPart = fractionalPart.replace(/0+$/, '');
+
+    return `${formattedInteger},${trimmedFractionalPart}`;
+}
+
+function formatCurrency(amount) {
+    return amount.toLocaleString('ru-RU', {
+        style: 'currency',
+        currency: 'RUB',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }

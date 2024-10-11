@@ -20,12 +20,3 @@ function fetchSpendingData(startDate, endDate) {
         xhr.send();
     });
 }
-
-function formatCurrency(amount) {
-    return amount.toLocaleString('ru-RU', {
-        style: 'currency',
-        currency: 'RUB',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}

@@ -60,30 +60,44 @@ function bindActionsExpenses() {
         $(this).val(isNaN(formattedValue) ? '' : formattedValue.toFixed(2));
     });
 
-    $('#saveChangesBtn').on('click', function() {
+    $('#saveChangesBtn').on('click', function () {
         const partDescription = document.getElementById('partDescription').value;
         const count = document.getElementById('count').value;
         const amount = document.getElementById('amount').value;
-    
+
         if (!partDescription || !count || !amount) {
             alert("Пожалуйста, заполните все обязательные поля.");
             return;
         }
-    
+
         // Логика сохранения изменений
     });
 
-    $('#deleteExpenseBtn').on('click', function() {
+    $('#deleteExpenseBtn').on('click', function () {
         const partAndServiceId = document.getElementById('partAndServiceId').value;
-    
+
         if (!partAndServiceId) {
             alert("Не удалось удалить. Идентификатор расхода не найден.");
             return;
         }
-    
-        // Логика удаления расхода
-        // Например, отправка запроса на сервер для удаления элемента
-        console.log(`Удаление расхода с ID: ${partAndServiceId}`);
+
+        // Отправка DELETE-запроса на сервер
+        $.ajax({
+            url: `/api/spending/${partAndServiceId}`, // Эндпоинт для удаления
+            type: 'DELETE',
+            success: function () {
+                alert("Расход успешно удален.");
+                // logic for modal window
+                $('#editExpenseModal').modal('hide');
+            },
+            error: function (xhr) {
+                if (xhr.status === 404) {
+                    alert("Расход не найден.");
+                } else {
+                    alert("Ошибка при удалении расхода: " + xhr.responseText);
+                }
+            }
+        });
     });
 }
 

@@ -45,9 +45,9 @@ public class SpendingService {
     // return spendingRepository.save(spending);
     // }
 
-    // public void delete(Spending spending) {
-    // spendingRepository.delete(spending);
-    // }
+    public void delete(Long spendingId, String databaseIdentifier) {
+        spendingRepository.deleteById(spendingId, databaseIdentifier);
+    }
 
     // public void delete(Long id) {
     // spendingRepository.deleteById(id);

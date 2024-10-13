@@ -60,6 +60,31 @@ function bindActionsExpenses() {
         $(this).val(isNaN(formattedValue) ? '' : formattedValue.toFixed(2));
     });
 
+    $('#saveChangesBtn').on('click', function() {
+        const partDescription = document.getElementById('partDescription').value;
+        const count = document.getElementById('count').value;
+        const amount = document.getElementById('amount').value;
+    
+        if (!partDescription || !count || !amount) {
+            alert("Пожалуйста, заполните все обязательные поля.");
+            return;
+        }
+    
+        // Логика сохранения изменений
+    });
+
+    $('#deleteExpenseBtn').on('click', function() {
+        const partAndServiceId = document.getElementById('partAndServiceId').value;
+    
+        if (!partAndServiceId) {
+            alert("Не удалось удалить. Идентификатор расхода не найден.");
+            return;
+        }
+    
+        // Логика удаления расхода
+        // Например, отправка запроса на сервер для удаления элемента
+        console.log(`Удаление расхода с ID: ${partAndServiceId}`);
+    });
 }
 
 function openEditModal(expense) {

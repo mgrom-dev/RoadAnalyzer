@@ -10,6 +10,7 @@ function loadExpensesData() {
             const expensesList = $('#expensesList');
             expensesList.empty();
 
+            data.sort((a, b) => new Date(b.date) - new Date(a.date));
             data.forEach(expense => {
                 const row = $(`
                     <tr class="align-middle">
@@ -21,7 +22,7 @@ function loadExpensesData() {
                 `);
 
                 row.on('click', () => {
-                    openEditModal(expense);
+                    openEditModal(expense, row);
                 });
 
                 expensesList.append(row);
@@ -72,36 +73,9 @@ function bindActionsExpenses() {
 
         // Логика сохранения изменений
     });
-
-    $('#deleteExpenseBtn').on('click', function () {
-        const partAndServiceId = document.getElementById('partAndServiceId').value;
-
-        if (!partAndServiceId) {
-            alert("Не удалось удалить. Идентификатор расхода не найден.");
-            return;
-        }
-
-        // Отправка DELETE-запроса на сервер
-        $.ajax({
-            url: `/api/spending/${partAndServiceId}`, // Эндпоинт для удаления
-            type: 'DELETE',
-            success: function () {
-                alert("Расход успешно удален.");
-                // logic for modal window
-                $('#editExpenseModal').modal('hide');
-            },
-            error: function (xhr) {
-                if (xhr.status === 404) {
-                    alert("Расход не найден.");
-                } else {
-                    alert("Ошибка при удалении расхода: " + xhr.responseText);
-                }
-            }
-        });
-    });
 }
 
-function openEditModal(expense) {
+function openEditModal(expense, row) {
     $('#partAndServiceId').val(expense.partAndServiceId);
     $('#expenseDate').val(formatDate(expense.date));
     $('#partDescription').val(expense.partDescription);
@@ -109,6 +83,29 @@ function openEditModal(expense) {
     $('#count').val(expense.count);
     $('#amount').val(expense.amount);
 
-    // Открываем модальное окно
+    $('#deleteExpenseBtn').off('click').on('click', () => deleteExpense(expense, row));
+
     $('#editExpenseModal').modal('show');
+}
+
+function deleteExpense(expense, row) {
+    const partAndServiceId = expense.partAndServiceId;
+
+    if (!partAndServiceId) {
+        console.log("Не удалось удалить. Идентификатор расхода не найден.");
+        return;
+    }
+
+    $.ajax({
+        url: `/api/spending/${partAndServiceId}`,
+        type: 'DELETE',
+        success: function () {
+            row.remove();
+        },
+        error: function (xhr) {
+            console.log("Ошибка при удалении расхода: " + xhr.responseText);
+        }
+    }).always(function () {
+        $('#editExpenseModal').modal('hide');
+    });
 }

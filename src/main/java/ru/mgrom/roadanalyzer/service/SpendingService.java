@@ -42,7 +42,7 @@ public class SpendingService {
     }
 
     // public Spending create(Spending spending) {
-    // return spendingRepository.save(spending);
+    //     return spendingRepository.save(spending, );
     // }
 
     public void delete(Long spendingId, String databaseIdentifier) {

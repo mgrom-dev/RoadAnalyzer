@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 Not Found</title>
+    <title>400 Bad Request</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f2f9fc;
             color: #333;
             display: flex;
             justify-content: center;
@@ -31,11 +31,13 @@
         h2 {
             font-size: 24px;
             margin-top: 10px;
+            color: #2c3e50;
         }
 
         p {
             font-size: 18px;
             margin: 20px 0;
+            color: #555;
         }
 
         a {
@@ -58,10 +60,10 @@
 <body>
 
     <div class="container">
-        <i class="fas fa-exclamation-triangle icon"></i>
-        <h1>404</h1>
-        <h2>Страница не найдена</h2>
-        <p>К сожалению, запрашиваемая вами страница не существует.</p>
+        <i class="fas fa-times-circle icon"></i>
+        <h1>400</h1>
+        <h2>Неверный запрос</h2>
+        <p>К сожалению, ваш запрос не может быть обработан из-за неверных данных.</p>
         <p><a href="/">Вернуться на главную страницу</a></p>
     </div>
 

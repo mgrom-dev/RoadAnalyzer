@@ -41,9 +41,9 @@ public class SpendingService {
         return spendingRepository.findSpendingsByDateRangeDTO(createdAtAfter, createdAtBefore, databaseIdentifier);
     }
 
-    // public Spending create(Spending spending) {
-    //     return spendingRepository.save(spending, );
-    // }
+    public boolean create(Spending spending, String databaseIdentifier) {
+        return spendingRepository.save(spending, databaseIdentifier);
+    }
 
     public void delete(Long spendingId, String databaseIdentifier) {
         spendingRepository.deleteById(spendingId, databaseIdentifier);

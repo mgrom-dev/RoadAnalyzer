@@ -3,10 +3,13 @@ package ru.mgrom.roadanalyzer.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,11 +59,16 @@ public class SpendingController {
     // .orElseGet(() -> ResponseEntity.notFound().build());
     // }
 
-    // @PostMapping
-    // public ResponseEntity<Spending> create(@RequestBody Spending spending) {
-    // final Spending created = spendingService.create(spending);
-    // return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    // }
+    @PostMapping
+    public ResponseEntity<String> create(@RequestBody Spending spending, HttpServletRequest request) {
+        boolean isCreated = spendingService.create(spending, SessionUtils.getDatabaseId(request));
+        if (isCreated) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Spending created successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to create spending: Invalid data or conflict");
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, HttpServletRequest request) {

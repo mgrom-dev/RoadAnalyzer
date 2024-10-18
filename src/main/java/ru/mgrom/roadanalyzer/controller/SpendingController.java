@@ -18,15 +18,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import ru.mgrom.roadanalyzer.dto.SpendingDTO;
 import ru.mgrom.roadanalyzer.model.Spending;
 import ru.mgrom.roadanalyzer.service.SessionUtils;
-import ru.mgrom.roadanalyzer.service.SpendingService;
+import ru.mgrom.roadanalyzer.service.PartAndService;
 
 @RestController
 @RequestMapping("/api/spending")
 public class SpendingController {
 
-    private final SpendingService spendingService;
+    private final PartAndService spendingService;
 
-    public SpendingController(SpendingService spendingService) {
+    public SpendingController(PartAndService spendingService) {
         this.spendingService = spendingService;
     }
 

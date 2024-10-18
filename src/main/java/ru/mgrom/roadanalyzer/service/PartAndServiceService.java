@@ -32,6 +32,10 @@ public class PartAndServiceService {
         partAndServiceRepository.delete(partAndService, databaseIdentifier);
     }
 
+    public void delete(Long partAndServiceId, String databaseIdentifier) {
+        partAndServiceRepository.deleteById(partAndServiceId, databaseIdentifier);
+    }
+
     public boolean update(Long id, PartAndService partAndService, String databaseIdentifier) {
         partAndService.setId(id);
         return partAndServiceRepository.save(partAndService, databaseIdentifier);

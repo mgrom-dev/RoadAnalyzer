@@ -18,7 +18,7 @@ import ru.mgrom.roadanalyzer.service.PartAndServiceService;
 import ru.mgrom.roadanalyzer.service.SessionUtils;
 
 @RestController
-@RequestMapping("/part_and_service")
+@RequestMapping("/api/part_and_service")
 public class PartAndServiceController {
     private final PartAndServiceService partAndServiceService;
 

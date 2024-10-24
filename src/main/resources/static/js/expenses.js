@@ -85,6 +85,51 @@ function openEditModal(expense, row) {
 
     $('#deleteExpenseBtn').off('click').on('click', () => deleteExpense(expense, row));
 
+    let types = [];
+    let parts = [];
+
+    $.ajax({
+        url: `/api/expense_type`,
+        type: 'GET',
+        success: function (data) {
+            types = data;
+        }
+    });
+
+    $.ajax({
+        url: `/api/part_and_service`,
+        type: 'GET',
+        success: function (data) {
+            parts = data;
+        }
+    });
+
+    $('#partDescription').on('input', function() {
+        const inputValue = $(this).val().toLowerCase(); // Используем $(this) для доступа к полю ввода
+        const suggestionsContainer = $('#suggestions');
+
+        // Очищаем предыдущие подсказки
+        suggestionsContainer.empty();
+
+        if (inputValue) {
+            // Фильтруем массив данных
+            const filteredData = parts.filter(item => item.description.toLowerCase().includes(inputValue));
+
+            // Создаем и отображаем подсказки
+            filteredData.forEach(item => {
+                const suggestionItem = $('<div class="suggestion-item"></div>').text(item.description);
+
+                // Обработчик клика по подсказке
+                suggestionItem.on('click', function () {
+                    $('#partDescription').val(item.description); // Устанавливаем значение поля ввода
+                    suggestionsContainer.empty(); // Очищаем подсказки
+                });
+
+                suggestionsContainer.append(suggestionItem);
+            });
+        }
+    });
+
     $('#editExpenseModal').modal('show');
 }
 

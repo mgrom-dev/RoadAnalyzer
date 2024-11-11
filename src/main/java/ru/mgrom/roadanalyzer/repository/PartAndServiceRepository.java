@@ -2,6 +2,8 @@ package ru.mgrom.roadanalyzer.repository;
 
 import ru.mgrom.roadanalyzer.model.PartAndService;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,5 +32,13 @@ public class PartAndServiceRepository extends BaseRepository<PartAndService>
             System.out.println("error PartAndService: " + e.getMessage());
         }
         return isSaved;
+    }
+
+    public Optional<PartAndService> getByDescription(String description, String databaseIdentifier) {
+        String sql = "SELECT * FROM " + databaseIdentifier + "." + tableName
+                + " WHERE description = :description";
+        Query query = createQuery(sql, PartAndService.class);
+        query.setParameter("description", description);
+        return Optional.ofNullable((PartAndService) query.getSingleResult());
     }
 }

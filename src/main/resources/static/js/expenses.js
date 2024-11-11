@@ -61,6 +61,14 @@ function bindActionsExpenses() {
         $(this).val(isNaN(formattedValue) ? '' : formattedValue.toFixed(2));
     });
 
+    $(document).on('click', function(event) {
+        const partDescriptionInput = $('#partDescription');
+        const suggestionsContainer = $('#suggestions');
+        if (!partDescriptionInput.is(event.target) && !suggestionsContainer.is(event.target) && !suggestionsContainer.has(event.target).length) {
+            suggestionsContainer.hide(); // Скрываем подсказки
+        }
+    });
+
     $('#saveChangesBtn').on('click', function () {
         const partDescription = document.getElementById('partDescription').value;
         const count = document.getElementById('count').value;
@@ -72,11 +80,37 @@ function bindActionsExpenses() {
         }
 
         // Логика сохранения изменений
+        const spending = {
+            id: $('#expenseId').val(),
+            date: formatDateToLocalDate($('#expenseDate').val()),
+            partAndServiceId: parseInt($('#partAndServiceId').val()),
+            description: $('#description').val(),
+            count: parseFloat(count),
+            amount: parseFloat(amount),
+            partDescription: partDescription,
+            partType: parseInt($('#partType').val()),
+            partTypeDescription: $('#partTypeDescription').val()
+        };
+
+        $.ajax({
+            url: `/api/spending`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(spending),
+            success: function (data) {
+                loadExpensesData();
+            }
+        });
+
+        $('#editExpenseModal').modal('hide');
     });
 }
 
 function openEditModal(expense, row) {
+    $('#expenseId').val(expense.id);
     $('#partAndServiceId').val(expense.partAndServiceId);
+    $('#partType').val(expense.partType);
+    $('#partTypeDescription').val(expense.partTypeDescription);
     $('#expenseDate').val(formatDate(expense.date));
     $('#partDescription').val(expense.partDescription);
     $('#description').val(expense.description || '');
@@ -104,16 +138,23 @@ function openEditModal(expense, row) {
         }
     });
 
-    $('#partDescription').on('input', function() {
+    $('#partDescription').on('input', function () {
         const inputValue = $(this).val().toLowerCase(); // Используем $(this) для доступа к полю ввода
         const suggestionsContainer = $('#suggestions');
 
         // Очищаем предыдущие подсказки
         suggestionsContainer.empty();
 
+        // clear hidden input default
+        $('#partType').val('');
+        $('#partTypeDescription').val('');
+        $('#partAndServiceId').val('');
+
         if (inputValue) {
             // Фильтруем массив данных
             const filteredData = parts.filter(item => item.description.toLowerCase().includes(inputValue));
+
+            suggestionsContainer[0].style.display = filteredData.length > 0 ? 'block' : 'none';
 
             // Создаем и отображаем подсказки
             filteredData.forEach(item => {
@@ -121,12 +162,19 @@ function openEditModal(expense, row) {
 
                 // Обработчик клика по подсказке
                 suggestionItem.on('click', function () {
+                    const type = types.find(t => t.id == item.type);
+                    $('#partAndServiceId').val(item.id);
                     $('#partDescription').val(item.description); // Устанавливаем значение поля ввода
+                    $('#partType').val(type.id);
+                    $('#partTypeDescription').val(type.description);
                     suggestionsContainer.empty(); // Очищаем подсказки
+                    suggestionsContainer[0].style.display = 'none';
                 });
 
                 suggestionsContainer.append(suggestionItem);
             });
+        } else {
+            suggestionsContainer[0].style.display = 'none';
         }
     });
 

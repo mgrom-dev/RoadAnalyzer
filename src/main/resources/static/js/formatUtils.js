@@ -7,6 +7,14 @@ function formatDate(dateString) {
     return `${day}.${month}.${year}`; // Formating date as dd.MM.yyyy
 }
 
+function formatDateToLocalDate(dateString) {
+    const parts = dateString.split('.');
+    if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    console.log("error format date to LocalDate");
+}
+
 function formatNumber(num, decimalPlaces) {
     if (num === null || num === undefined || isNaN(num)) {
         return '';

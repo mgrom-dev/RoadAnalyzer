@@ -10,10 +10,10 @@ import ru.mgrom.roadanalyzer.model.Spending;
 import ru.mgrom.roadanalyzer.repository.SpendingRepository;
 
 @Service
-public class PartAndService {
+public class SpendingService {
     private final SpendingRepository spendingRepository;
 
-    public PartAndService(SpendingRepository spendingRepository) {
+    public SpendingService(SpendingRepository spendingRepository) {
         this.spendingRepository = spendingRepository;
     }
 

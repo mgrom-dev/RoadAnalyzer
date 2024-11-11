@@ -20,6 +20,10 @@ public class PartAndServiceService {
         return partAndServiceRepository.findById(id, databaseIdentifier);
     }
 
+    public Optional<PartAndService> getByDescription(String description, String databaseIdentifier) {
+        return partAndServiceRepository.getByDescription(description, databaseIdentifier);
+    }
+
     public List<PartAndService> getAll(String databaseIdentifier) {
         return partAndServiceRepository.findAll(databaseIdentifier);
     }

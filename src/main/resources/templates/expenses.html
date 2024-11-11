@@ -24,7 +24,10 @@
             </div>
             <div class="modal-body">
                 <form id="editExpenseForm">
+                    <input type="hidden" id="expenseId" />
                     <input type="hidden" id="partAndServiceId" />
+                    <input type="hidden" id="partType" />
+                    <input type="hidden" id="partTypeDescription" />
                     <div class="mb-3">
                         <label for="expenseDate" class="form-label">Дата</label>
                         <input type="text" class="form-control" id="expenseDate" readonly />

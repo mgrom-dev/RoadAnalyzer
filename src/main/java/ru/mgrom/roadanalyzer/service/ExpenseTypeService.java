@@ -20,6 +20,10 @@ public class ExpenseTypeService {
         return expenseTypeRepository.findById(id, databaseIdentifier);
     }
 
+    public Optional<ExpenseType> getByDescription(String description, String databaseIdentifier) {
+        return expenseTypeRepository.getByDescription(description, databaseIdentifier);
+    }
+    
     public List<ExpenseType> getAll(String databaseIdentifier) {
         return expenseTypeRepository.findAll(databaseIdentifier);
     }

@@ -1,5 +1,7 @@
 package ru.mgrom.roadanalyzer.repository;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.Query;
@@ -29,5 +31,13 @@ public class ExpenseTypeRepository extends BaseRepository<ExpenseType>
             System.out.println("error ExpenseType: " + e.getMessage());
         }
         return isSaved;
+    }
+
+    public Optional<ExpenseType> getByDescription(String description, String databaseIdentifier) {
+        String sql = "SELECT * FROM " + databaseIdentifier + "." + tableName
+                + " WHERE description = :description";
+        Query query = createQuery(sql, ExpenseType.class);
+        query.setParameter("description", description);
+        return Optional.ofNullable((ExpenseType) query.getSingleResult());
     }
 }

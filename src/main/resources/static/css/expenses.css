@@ -29,10 +29,28 @@
 
  /* Стили для подсказок */
  .suggestions {
-    border: 1px solid #ccc;
-    max-height: 150px;
-    overflow-y: auto;
     position: absolute;
+    width: -webkit-fill-available;
+    overflow-y: hidden;
     background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     z-index: 1000;
+    display: none; /* Скрыто по умолчанию */
+}
+
+.suggestion-item {
+    padding: 8px 12px; /* Отступы внутри элемента подсказки */
+    cursor: pointer; /* Курсор при наведении */
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0; /* Цвет фона при наведении */
+}
+
+/* Установите высоту одной строки для элемента подсказки */
+.suggestion-item {
+    white-space: nowrap; /* Запрет на перенос текста */
+    overflow: hidden; /* Скрытие переполненного текста */
+    text-overflow: ellipsis; /* Троеточие для переполненного текста */
 }

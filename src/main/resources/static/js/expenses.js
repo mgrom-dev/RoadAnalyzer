@@ -61,48 +61,12 @@ function bindActionsExpenses() {
         $(this).val(isNaN(formattedValue) ? '' : formattedValue.toFixed(2));
     });
 
-    $(document).on('click', function(event) {
+    $(document).on('click', function (event) {
         const partDescriptionInput = $('#partDescription');
         const suggestionsContainer = $('#suggestions');
         if (!partDescriptionInput.is(event.target) && !suggestionsContainer.is(event.target) && !suggestionsContainer.has(event.target).length) {
             suggestionsContainer.hide(); // Скрываем подсказки
         }
-    });
-
-    $('#saveChangesBtn').on('click', function () {
-        const partDescription = document.getElementById('partDescription').value;
-        const count = document.getElementById('count').value;
-        const amount = document.getElementById('amount').value;
-
-        if (!partDescription || !count || !amount) {
-            alert("Пожалуйста, заполните все обязательные поля.");
-            return;
-        }
-
-        // Логика сохранения изменений
-        const spending = {
-            id: $('#expenseId').val(),
-            date: formatDateToLocalDate($('#expenseDate').val()),
-            partAndServiceId: parseInt($('#partAndServiceId').val()),
-            description: $('#description').val(),
-            count: parseFloat(count),
-            amount: parseFloat(amount),
-            partDescription: partDescription,
-            partType: parseInt($('#partType').val()),
-            partTypeDescription: $('#partTypeDescription').val()
-        };
-
-        $.ajax({
-            url: `/api/spending`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(spending),
-            success: function (data) {
-                loadExpensesData();
-            }
-        });
-
-        $('#editExpenseModal').modal('hide');
     });
 }
 
@@ -118,6 +82,7 @@ function openEditModal(expense, row) {
     $('#amount').val(expense.amount);
 
     $('#deleteExpenseBtn').off('click').on('click', () => deleteExpense(expense, row));
+    $('#saveChangesBtn').off('click').on('click', () => saveExpense(expense, row));
 
     let types = [];
     let parts = [];
@@ -201,4 +166,49 @@ function deleteExpense(expense, row) {
     }).always(function () {
         $('#editExpenseModal').modal('hide');
     });
+}
+
+function saveExpense(expense, row) {
+    const partDescription = document.getElementById('partDescription').value;
+    const count = document.getElementById('count').value;
+    const amount = document.getElementById('amount').value;
+
+    if (!partDescription || !count || !amount) {
+        alert("Пожалуйста, заполните все обязательные поля.");
+        return;
+    }
+
+    // Logic save changes
+    const spending = {
+        id: expense.id,
+        date: formatDateToLocalDate($('#expenseDate').val()),
+        partAndServiceId: parseInt($('#partAndServiceId').val()),
+        description: $('#description').val(),
+        count: parseFloat(count),
+        amount: parseFloat(amount),
+        partDescription: partDescription,
+        partType: parseInt($('#partType').val()),
+        partTypeDescription: $('#partTypeDescription').val()
+    };
+
+    $.ajax({
+        url: `/api/spending`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(spending),
+        success: function (data) {
+            if ("id" in data) {
+                expense = spending;
+                row.find('td').eq(0).text(formatDate(spending.date));
+                row.find('td').eq(1).text(`${spending.partDescription}${spending.description ? ` (${spending.description})` : ''}`);
+                row.find('td').eq(2).text(formatNumber(spending.count, 3));
+                row.find('td').eq(3).text(formatCurrency(spending.amount));
+            }
+        },
+        error: function (data) {
+            console.error("Error occurred while saving spending:", data.message);
+        }
+    });
+
+    $('#editExpenseModal').modal('hide');
 }

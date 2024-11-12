@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
+import ru.mgrom.roadanalyzer.dto.IdResponse;
 import ru.mgrom.roadanalyzer.model.ExpenseType;
 import ru.mgrom.roadanalyzer.service.ExpenseTypeService;
 import ru.mgrom.roadanalyzer.service.SessionUtils;
@@ -30,13 +31,14 @@ public class ExpenseTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody ExpenseType expenseType, HttpServletRequest request) {
-        boolean isCreated = expenseTypeService.create(expenseType, SessionUtils.getDatabaseId(request));
-        if (isCreated) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Expense type created successfully");
+    public ResponseEntity<IdResponse> create(@RequestBody ExpenseType expenseType, HttpServletRequest request) {
+        Long savedId = expenseTypeService.create(expenseType, SessionUtils.getDatabaseId(request));
+        if (savedId > 0) {
+            IdResponse response = new IdResponse("Expense type created successfully", savedId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to create expense type: Invalid data or conflict");
+            IdResponse response = new IdResponse("Failed to create expense type: Invalid data or conflict", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

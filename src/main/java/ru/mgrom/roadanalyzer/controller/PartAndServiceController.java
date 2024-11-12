@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
+import ru.mgrom.roadanalyzer.dto.IdResponse;
 import ru.mgrom.roadanalyzer.model.PartAndService;
 import ru.mgrom.roadanalyzer.service.PartAndServiceService;
 import ru.mgrom.roadanalyzer.service.SessionUtils;
@@ -32,13 +33,14 @@ public class PartAndServiceController {
     }
 
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody PartAndService partAndService, HttpServletRequest request) {
-        boolean isCreated = partAndServiceService.create(partAndService, SessionUtils.getDatabaseId(request));
-        if (isCreated) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Part and service created successfully");
+    public ResponseEntity<IdResponse> create(@RequestBody PartAndService partAndService, HttpServletRequest request) {
+        Long savedId = partAndServiceService.create(partAndService, SessionUtils.getDatabaseId(request));
+        if (savedId > 0) {
+            IdResponse response = new IdResponse("Part and service created successfully", savedId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to create part and service: Invalid data or conflict");
+            IdResponse response = new IdResponse("Failed to create part and service: Invalid data or conflict", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 

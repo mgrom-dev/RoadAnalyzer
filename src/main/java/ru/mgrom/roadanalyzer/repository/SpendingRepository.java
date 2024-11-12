@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import ru.mgrom.roadanalyzer.dto.SpendingDTO;
 import ru.mgrom.roadanalyzer.model.Spending;
 
@@ -56,25 +55,4 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
         return spendings;
     }
 
-    @Transactional
-    public boolean update(Spending spending, String databaseIdentifier) {
-        boolean isUpdated = false;
-        try {
-            String sql = "UPDATE " + databaseIdentifier + "." + tableName
-                    + " SET date = :date, part_and_service_id = :partAndServiceId, description = :description, count = :count, amount = :amount "
-                    + "WHERE id = :id";
-            Query query = createQuery(sql);
-            query.setParameter("date", spending.getDate());
-            query.setParameter("partAndServiceId", spending.getPartAndServiceId());
-            query.setParameter("description", spending.getDescription());
-            query.setParameter("count", spending.getCount());
-            query.setParameter("amount", spending.getAmount());
-            query.setParameter("id", spending.getId());
-            query.executeUpdate();
-            isUpdated = true;
-        } catch (Exception e) {
-            System.out.println("error updating Spending: " + e.getMessage());
-        }
-        return isUpdated;
-    }
 }

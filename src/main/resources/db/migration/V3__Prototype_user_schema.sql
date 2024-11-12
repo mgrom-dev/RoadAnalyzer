@@ -4,20 +4,23 @@ CREATE SCHEMA IF NOT EXISTS ${proto_user_db};
 CREATE TABLE IF NOT EXISTS
     ${proto_user_db}.expense_type (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        description VARCHAR(255) NOT NULL
+        description VARCHAR(255) NOT NULL,
+        UNIQUE (description)
     );
 
 CREATE TABLE IF NOT EXISTS
     ${proto_user_db}.part_and_service (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
         description VARCHAR(255) NOT NULL,
-        type BIGINT
+        type BIGINT,
+        UNIQUE (description, type)
     );
 
 CREATE TABLE IF NOT EXISTS
     ${proto_user_db}.part_group (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        description VARCHAR(255) NOT NULL
+        description VARCHAR(255) NOT NULL,
+        UNIQUE (description)
     );
 
 CREATE TABLE IF NOT EXISTS

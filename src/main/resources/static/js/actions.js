@@ -33,6 +33,10 @@ function addNewExpense() {
     `);
 
     $('#expensesList').prepend(newRow);
+    
+    newRow.on('click', () => {
+        openEditModal(expense, newRow);
+    });
 
     openEditModal(expense, newRow);
 }

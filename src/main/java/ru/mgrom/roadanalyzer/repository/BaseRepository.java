@@ -31,7 +31,7 @@ public abstract class BaseRepository<T> {
         this.tableName = tableName;
     }
 
-    private static String camelToSnake(String str) {
+    protected static String camelToSnake(String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }
@@ -46,9 +46,14 @@ public abstract class BaseRepository<T> {
         return entityManager.createNativeQuery(sql, resultClass);
     }
 
+    private Long getLastId(String databaseIdentifier) {
+        Query maxIdQuery = createQuery("SELECT MAX(id) FROM " + databaseIdentifier + "." + tableName);
+        return (Long) maxIdQuery.getSingleResult();
+    }
+
     @Transactional
-    public boolean save(T entity, String databaseIdentifier) {
-        boolean isSaved = false;
+    public Long save(T entity, String databaseIdentifier) {
+        Long savedId = 0L; // return 0 if error
         try {
             Field[] fields = entity.getClass().getDeclaredFields();
 
@@ -80,11 +85,76 @@ public abstract class BaseRepository<T> {
             }
 
             query.executeUpdate();
-            isSaved = true;
+            savedId = getLastId(databaseIdentifier);
         } catch (Exception e) {
             System.out.println("error saving entity: " + e.getMessage());
         }
-        return isSaved;
+        return savedId;
+    }
+
+    @Transactional
+    public boolean update(T entity, String databaseIdentifier) {
+        boolean isUpdated = false;
+        try {
+            Field[] fields = entity.getClass().getDeclaredFields();
+
+            Field idField = null;
+            Long idValue = null;
+
+            Class<?> clazz = entity.getClass();
+
+            // search field id in class and super class
+            while (clazz != null) {
+                try {
+                    idField = clazz.getDeclaredField("id");
+                    break;
+                } catch (NoSuchFieldException e) {
+                    clazz = clazz.getSuperclass(); // go to super class
+                }
+            }
+
+            // if field id finded
+            if (idField != null) {
+                idField.setAccessible(true);
+                idValue = (Long) idField.get(entity);
+            }
+
+            if (idValue == null) {
+                throw new IllegalArgumentException("Entity must have an ID to be updated.");
+            }
+
+            // SQL query generation
+            StringBuilder sql = new StringBuilder("UPDATE " + databaseIdentifier + "." + tableName + " SET ");
+
+            for (Field field : fields) {
+                field.setAccessible(true);
+                if (field.getName().equals("id")) {
+                    continue;
+                }
+                String columnName = camelToSnake(field.getName());
+                sql.append(columnName).append(" = :").append(field.getName()).append(", ");
+            }
+
+            // remove last commas and add condition WHERE
+            sql.setLength(sql.length() - 2);
+            sql.append(" WHERE id = :id");
+
+            Query query = createQuery(sql.toString());
+
+            query.setParameter("id", idValue);
+            for (Field field : fields) {
+                if (field.getName().equals("id")) {
+                    continue;
+                }
+                query.setParameter(field.getName(), field.get(entity));
+            }
+
+            query.executeUpdate();
+            isUpdated = true;
+        } catch (Exception e) {
+            System.out.println("Error updating entity: " + e.getMessage());
+        }
+        return isUpdated;
     }
 
     @SuppressWarnings("unchecked")

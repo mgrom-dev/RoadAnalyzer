@@ -10,7 +10,7 @@ public interface ServiceInterface<T> {
         
     List<T> getAll(String databaseIdentifier);
     
-    boolean create(T entity, String databaseIdentifier);
+    Long create(T entity, String databaseIdentifier);
     
     void delete(T entity, String databaseIdentifier);
     

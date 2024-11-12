@@ -23,7 +23,7 @@ public abstract class BaseService<M, R extends GenericRepository<M>> {
         return repository.findAll(databaseIdentifier);
     }
 
-    public boolean create(M entity, String databaseIdentifier) {
+    public Long create(M entity, String databaseIdentifier) {
         return repository.save(entity, databaseIdentifier);
     }
 

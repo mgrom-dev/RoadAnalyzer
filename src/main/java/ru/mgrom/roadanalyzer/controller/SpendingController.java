@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
+import ru.mgrom.roadanalyzer.dto.IdResponse;
 import ru.mgrom.roadanalyzer.dto.SpendingDTO;
 import ru.mgrom.roadanalyzer.model.ExpenseType;
 import ru.mgrom.roadanalyzer.model.PartAndService;
@@ -70,11 +71,11 @@ public class SpendingController {
     // }
 
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody SpendingDTO spendingDTO, HttpServletRequest request) {
+    public ResponseEntity<IdResponse> create(@RequestBody SpendingDTO spendingDTO, HttpServletRequest request) {
         if (spendingDTO.getPartAndServiceId() == null) { // new part and service
             if (spendingDTO.getPartDescription().isBlank()) { // description not set, error
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Failed to create spending: part and service not set");
+                IdResponse response = new IdResponse("Failed to create spending: part and service not set", null);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             // checking for a new part type
@@ -98,8 +99,8 @@ public class SpendingController {
             if (partAndServiceOptional.isPresent()) {
                 spendingDTO.setPartAndServiceId(partAndServiceOptional.get().getId());
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Failed to create spending: part and service not created");
+                IdResponse response = new IdResponse("Failed to create spending: part and service not created", null);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
         }
 
@@ -110,19 +111,21 @@ public class SpendingController {
         spending.setCount(spendingDTO.getCount());
         spending.setAmount(spendingDTO.getAmount());
 
-        boolean isSaved = false;
+        Long savedId = 0L;
         if (spendingDTO.getId() != null) {
             spending.setId(spendingDTO.getId());
-            isSaved = spendingService.update(spending, SessionUtils.getDatabaseId(request));
+            savedId = spendingDTO.getId();
+            spendingService.update(spending, SessionUtils.getDatabaseId(request));
         } else {
-            isSaved = spendingService.create(spending, SessionUtils.getDatabaseId(request));
+            savedId = spendingService.create(spending, SessionUtils.getDatabaseId(request));
         }
 
-        if (isSaved) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Spending saved successfully");
+        if (savedId > 0) {
+            IdResponse response = new IdResponse("Spending saved successfully", savedId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to save spending: Invalid data or conflict");
+            IdResponse response = new IdResponse("Failed to save spending: Invalid data or conflict", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 

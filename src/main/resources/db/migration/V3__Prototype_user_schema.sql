@@ -45,6 +45,13 @@ CREATE TABLE IF NOT EXISTS
         amount DOUBLE
     );
 
+CREATE TABLE IF NOT EXISTS
+    ${proto_user_db}.info (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        key_info VARCHAR(255),
+        value_info VARCHAR(255)
+    );
+
 -- default data
 INSERT INTO
     ${proto_user_db}.expense_type (description)
@@ -52,3 +59,10 @@ VALUES
     ('топливо'),
     ('услуги'),
     ('запчасти');
+
+INSERT INTO
+    ${proto_user_db}.info (key_info, value_info)
+VALUES
+    ('марка авто', 'Марка'),
+    ('модель авто', 'Модель'),
+    ('дата выпуска', '');

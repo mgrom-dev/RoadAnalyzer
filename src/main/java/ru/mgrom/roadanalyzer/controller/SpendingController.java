@@ -33,7 +33,8 @@ public class SpendingController {
     private final ExpenseTypeService expenseTypeService;
     private final PartAndServiceService partAndServiceService;
 
-    public SpendingController(SpendingService spendingService, ExpenseTypeService expenseTypeService, PartAndServiceService partAndServiceService) {
+    public SpendingController(SpendingService spendingService, ExpenseTypeService expenseTypeService,
+            PartAndServiceService partAndServiceService) {
         this.spendingService = spendingService;
         this.expenseTypeService = expenseTypeService;
         this.partAndServiceService = partAndServiceService;
@@ -70,53 +71,58 @@ public class SpendingController {
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody SpendingDTO spendingDTO, HttpServletRequest request) {
-        System.out.println(spendingDTO);
-        if (spendingDTO.getPartAndServiceId() == null) {
-            String partDescription = spendingDTO.getPartDescription();
-            if (partDescription.isEmpty() || partDescription.isBlank()) {
+        if (spendingDTO.getPartAndServiceId() == null) { // new part and service
+            if (spendingDTO.getPartDescription().isBlank()) { // description not set, error
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to create spending: part and service not set");
+                        .body("Failed to create spending: part and service not set");
+            }
+
+            // checking for a new part type
+            String newTypeDescription = spendingDTO.getPartTypeDescription();
+            if (spendingDTO.getPartType() == null && !newTypeDescription.isBlank()) {
+                expenseTypeService.create(new ExpenseType(newTypeDescription), SessionUtils.getDatabaseId(request));
+                expenseTypeService.getByDescription(newTypeDescription, SessionUtils.getDatabaseId(request))
+                        .ifPresent(expenseType -> {
+                            spendingDTO.setPartType(expenseType.getId());
+                        });
             } else {
-                String partTypeDescription = spendingDTO.getPartTypeDescription();
-                Long partTypeId = 3L;
-                if (spendingDTO.getPartType() == null && !partTypeDescription.isEmpty() && !partTypeDescription.isBlank()) {
-                    ExpenseType expenseType = new ExpenseType();
-                    expenseType.setDescription(partTypeDescription);
-                    expenseTypeService.create(expenseType, SessionUtils.getDatabaseId(request));
-                    Optional<ExpenseType> expOptional = expenseTypeService.getByDescription(partTypeDescription, SessionUtils.getDatabaseId(request));
-                    if (expOptional.isPresent()) {
-                        expenseType = expOptional.get();
-                    }
-                    partTypeId = expenseType.getId();
-                    spendingDTO.setPartType(partTypeId);
-                }
-                
-                PartAndService partAndService = new PartAndService();
-                partAndService.setDescription(partDescription);
-                partAndService.setType(partTypeId);
-                partAndServiceService.create(partAndService, SessionUtils.getDatabaseId(request));
-                Optional<PartAndService> parOptional = partAndServiceService.getByDescription(partDescription, SessionUtils.getDatabaseId(request));
-                if (parOptional.isPresent()) {
-                    partAndService = parOptional.get();
-                } else {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                           .body("Failed to create spending: Failed to create part and service");
-                }
-                spendingDTO.setPartAndServiceId(partAndService.getId());
+                spendingDTO.setPartType(3L); // default type - spare parts
+            }
+
+            // create new part and service
+            PartAndService newPartAndService = new PartAndService(spendingDTO.getPartDescription(),
+                    spendingDTO.getPartType());
+            partAndServiceService.create(newPartAndService, SessionUtils.getDatabaseId(request));
+            Optional<PartAndService> partAndServiceOptional = partAndServiceService.get(newPartAndService,
+                    SessionUtils.getDatabaseId(request));
+            if (partAndServiceOptional.isPresent()) {
+                spendingDTO.setPartAndServiceId(partAndServiceOptional.get().getId());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to create spending: part and service not created");
             }
         }
+
         Spending spending = new Spending();
         spending.setDate(spendingDTO.getDate());
         spending.setPartAndServiceId(spendingDTO.getPartAndServiceId());
         spending.setDescription(spendingDTO.getDescription());
         spending.setCount(spendingDTO.getCount());
         spending.setAmount(spendingDTO.getAmount());
-        boolean isCreated = spendingService.create(spending, SessionUtils.getDatabaseId(request));
-        if (isCreated) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Spending created successfully");
+
+        boolean isSaved = false;
+        if (spendingDTO.getId() != null) {
+            spending.setId(spendingDTO.getId());
+            isSaved = spendingService.update(spending, SessionUtils.getDatabaseId(request));
+        } else {
+            isSaved = spendingService.create(spending, SessionUtils.getDatabaseId(request));
+        }
+
+        if (isSaved) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Spending saved successfully");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to create spending: Invalid data or conflict");
+                    .body("Failed to save spending: Invalid data or conflict");
         }
     }
 

@@ -16,6 +16,10 @@ public class PartAndServiceService {
         this.partAndServiceRepository = partAndServiceRepository;
     }
 
+    public Optional<PartAndService> get(PartAndService partAndService, String databaseIdentifier) {
+        return partAndServiceRepository.find(partAndService, databaseIdentifier);
+    }
+
     public Optional<PartAndService> getById(Long id, String databaseIdentifier) {
         return partAndServiceRepository.findById(id, databaseIdentifier);
     }

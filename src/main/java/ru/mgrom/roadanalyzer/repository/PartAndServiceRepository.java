@@ -17,21 +17,23 @@ public class PartAndServiceRepository extends BaseRepository<PartAndService>
         super(PartAndService.class, "part_and_service");
     }
 
+    @Override
     @Transactional
-    public boolean save(PartAndService partAndService, String databaseIdentifier) {
-        boolean isSaved = false;
+    public boolean update(PartAndService partAndService, String databaseIdentifier) {
+        boolean isUpdated = false;
         try {
-            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
-                    + "  (description, type) VALUES (:description, :type)";
+            String sql = "UPDATE " + databaseIdentifier + "." + tableName
+                    + " SET description = :description, type = :type WHERE id = :id";
             Query query = entityManager.createNativeQuery(sql);
             query.setParameter("description", partAndService.getDescription());
             query.setParameter("type", partAndService.getType());
+            query.setParameter("id", partAndService.getId());
             query.executeUpdate();
-            isSaved = true;
+            isUpdated = true;
         } catch (Exception e) {
-            System.out.println("error PartAndService: " + e.getMessage());
+            System.out.println("error updating PartAndService: " + e.getMessage());
         }
-        return isSaved;
+        return isUpdated;
     }
 
     public Optional<PartAndService> getByDescription(String description, String databaseIdentifier) {

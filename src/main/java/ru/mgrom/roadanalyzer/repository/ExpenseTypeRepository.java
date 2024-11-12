@@ -18,19 +18,20 @@ public class ExpenseTypeRepository extends BaseRepository<ExpenseType>
 
     @Override
     @Transactional
-    public boolean save(ExpenseType expenseType, String databaseIdentifier) {
-        boolean isSaved = false;
+    public boolean update(ExpenseType expenseType, String databaseIdentifier) {
+        boolean isUpdated = false;
         try {
-            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
-                    + " (description) VALUES (:description)";
+            String sql = "UPDATE " + databaseIdentifier + "." + tableName
+                    + " SET description = :description WHERE id = :id";
             Query query = createQuery(sql);
             query.setParameter("description", expenseType.getDescription());
+            query.setParameter("id", expenseType.getId());
             query.executeUpdate();
-            isSaved = true;
+            isUpdated = true;
         } catch (Exception e) {
-            System.out.println("error ExpenseType: " + e.getMessage());
+            System.out.println("error updating ExpenseType: " + e.getMessage());
         }
-        return isSaved;
+        return isUpdated;
     }
 
     public Optional<ExpenseType> getByDescription(String description, String databaseIdentifier) {

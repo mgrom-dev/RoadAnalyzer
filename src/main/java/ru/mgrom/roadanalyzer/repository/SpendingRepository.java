@@ -56,24 +56,25 @@ public class SpendingRepository extends BaseRepository<Spending> implements Gene
         return spendings;
     }
 
-    @Override
     @Transactional
-    public boolean save(Spending spending, String databaseIdentifier) {
-        boolean isSaved = false;
+    public boolean update(Spending spending, String databaseIdentifier) {
+        boolean isUpdated = false;
         try {
-            String sql = "INSERT INTO " + databaseIdentifier + "." + tableName
-                    + " (date, part_and_service_id, description, count, amount) VALUES (:date, :partAndServiceId, :description, :count, :amount)";
+            String sql = "UPDATE " + databaseIdentifier + "." + tableName
+                    + " SET date = :date, part_and_service_id = :partAndServiceId, description = :description, count = :count, amount = :amount "
+                    + "WHERE id = :id";
             Query query = createQuery(sql);
             query.setParameter("date", spending.getDate());
             query.setParameter("partAndServiceId", spending.getPartAndServiceId());
             query.setParameter("description", spending.getDescription());
             query.setParameter("count", spending.getCount());
             query.setParameter("amount", spending.getAmount());
+            query.setParameter("id", spending.getId());
             query.executeUpdate();
-            isSaved = true;
+            isUpdated = true;
         } catch (Exception e) {
-            System.out.println("error PartAndService: " + e.getMessage());
+            System.out.println("error updating Spending: " + e.getMessage());
         }
-        return isSaved;
+        return isUpdated;
     }
 }

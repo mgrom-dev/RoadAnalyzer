@@ -2,6 +2,7 @@ package ru.mgrom.roadanalyzer.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -17,16 +18,9 @@ public class SpendingService {
         this.spendingRepository = spendingRepository;
     }
 
-    // public Optional<Spending> getById(Long id) {
-    // return spendingRepository.findById(id);
-    // }
-
-    // public List<Spending> getAll(LocalDate createdAtBefore, LocalDate
-    // createdAtAfter) {
-    // createdAtBefore = createdAtBefore == null ? LocalDate.MIN : createdAtBefore;
-    // createdAtAfter = createdAtAfter == null ? LocalDate.MAX : createdAtAfter;
-    // return spendingRepository.findByDateBetween(createdAtAfter, createdAtBefore);
-    // }
+    public Optional<Spending> getById(Long id, String databaseIdentifier) {
+        return spendingRepository.findById(id, databaseIdentifier);
+    }
 
     public List<Spending> getAll(LocalDate createdAtBefore, LocalDate createdAtAfter, String databaseIdentifier) {
         createdAtBefore = createdAtBefore == null ? LocalDate.MIN : createdAtBefore;
@@ -45,16 +39,11 @@ public class SpendingService {
         return spendingRepository.save(spending, databaseIdentifier);
     }
 
+    public boolean update(Spending spending, String databaseIdentifier) {
+        return spendingRepository.update(spending, databaseIdentifier);
+    }
+
     public void delete(Long spendingId, String databaseIdentifier) {
         spendingRepository.deleteById(spendingId, databaseIdentifier);
     }
-
-    // public void delete(Long id) {
-    // spendingRepository.deleteById(id);
-    // }
-
-    // public Optional<Spending> update(Long id, Spending spending) {
-    // spending.setId(id);
-    // return Optional.of(spendingRepository.save(spending));
-    // }
 }

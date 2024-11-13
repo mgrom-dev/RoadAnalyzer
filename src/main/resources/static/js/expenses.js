@@ -11,26 +11,28 @@ function loadExpensesData() {
             expensesList.empty();
 
             data.sort((a, b) => new Date(b.date) - new Date(a.date));
-            data.forEach(expense => {
-                const row = $(`
-                    <tr class="align-middle">
-                        <td>${formatDate(expense.date)}</td>
-                        <td>${expense.partDescription}${expense.description ? ` (${expense.description})` : ''}</td>
-                        <td>${formatNumber(expense.count, 3)}</td>
-                        <td>${formatCurrency(expense.amount)}</td>
-                    </tr>
-                `);
-
-                row.on('click', () => {
-                    openEditModal(expense, row);
-                });
-
-                expensesList.append(row);
-            });
+            data.forEach(expense => expensesList.append(createOrUpdateRow(expense)));
         })
         .catch(error => {
             console.error('Произошла ошибка:', error);
         });
+}
+
+function createOrUpdateRow(expense, existingRow = null) {
+    const newRow = $(`
+        <tr class="align-middle">
+            <td>${formatDate(expense.date)}</td>
+            <td>${expense.partDescription}${expense.description ? ` (${expense.description})` : ''}</td>
+            <td>${formatNumber(expense.count, 3)}</td>
+            <td>${formatCurrency(expense.amount)}</td>
+        </tr>
+    `);
+
+    newRow.on('click', () => openEditModal(expense, newRow));
+
+    if (existingRow) existingRow.replaceWith(newRow);
+
+    return newRow;
 }
 
 function bindActionsExpenses() {
@@ -182,12 +184,12 @@ function saveExpense(expense, row) {
     const spending = {
         id: expense.id,
         date: formatDateToLocalDate($('#expenseDate').val()),
-        partAndServiceId: parseInt($('#partAndServiceId').val()),
+        partAndServiceId: parseInt($('#partAndServiceId').val()) || null,
         description: $('#description').val(),
-        count: parseFloat(count),
-        amount: parseFloat(amount),
+        count: parseFloat(count) || 0,
+        amount: parseFloat(amount) || 0,
         partDescription: partDescription,
-        partType: parseInt($('#partType').val()),
+        partType: parseInt($('#partType').val()) || null,
         partTypeDescription: $('#partTypeDescription').val()
     };
 
@@ -197,13 +199,9 @@ function saveExpense(expense, row) {
         contentType: 'application/json',
         data: JSON.stringify(spending),
         success: function (data) {
-            if ("id" in data) {
-                expense = spending;
-                row.find('td').eq(0).text(formatDate(spending.date));
-                row.find('td').eq(1).text(`${spending.partDescription}${spending.description ? ` (${spending.description})` : ''}`);
-                row.find('td').eq(2).text(formatNumber(spending.count, 3));
-                row.find('td').eq(3).text(formatCurrency(spending.amount));
-            }
+            expense = spending;
+            if ("id" in data) expense.id = data.id;
+            createOrUpdateRow(expense, row);
         },
         error: function (data) {
             console.error("Error occurred while saving spending:", data.message);

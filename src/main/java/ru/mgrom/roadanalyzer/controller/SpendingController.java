@@ -41,14 +41,6 @@ public class SpendingController {
         this.partAndServiceService = partAndServiceService;
     }
 
-    // @GetMapping
-    // public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false)
-    // LocalDate createdAtBefore,
-    // @RequestParam(required = false) LocalDate createdAtAfter) {
-    // return ResponseEntity.ok(spendingService.getAll(createdAtBefore,
-    // createdAtAfter));
-    // }
-
     @GetMapping
     public ResponseEntity<List<Spending>> getAll(@RequestParam(required = false) LocalDate createdAtBefore,
             @RequestParam(required = false) LocalDate createdAtAfter, HttpServletRequest request) {

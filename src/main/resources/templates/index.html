@@ -25,7 +25,7 @@
         <div class="flex justify-center items-center min-h-screen bg-neutral-50">
             <div class="w-[1200px] min-h-[800px] bg-white rounded-lg shadow-lg p-8">
                 <header class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold font-title">Марка/модель</h1>
+                    <h1 class="text-3xl font-bold font-title" id="modelCar" data-bs-toggle="modal" data-bs-target="#editCarModal">Марка-модель</h1>
                     <nav class="flex space-x-6">
                         <a href="#" class="text-primary" id="overviewTab">Обзор расходов</a>
                         <a href="#" class="text-primary" id="expensesTab">Расходы</a>
@@ -64,6 +64,35 @@
         </div>
     </div>
 
+    <!-- Form with car edit information (brand and model) -->
+    <div class="modal fade" id="editCarModal" tabindex="-1" aria-labelledby="editCarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCarModalLabel">Редактирование машины</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCarForm">
+                        <div class="mb-3">
+                            <label for="carBrand" class="form-label">Марка</label>
+                            <input type="text" class="form-control" id="carBrand" autocomplete="off"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="carModel" class="form-label">Модель</label>
+                            <input type="text" class="form-control" id="carModel" autocomplete="off"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveCarChangesBtn">Сохранить изменения</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/index.js"></script>
     <script src="/js/overview.js"></script>
     <script src="/js/expenses.js"></script>
     <script src="/js/loadNotifications.js"></script>

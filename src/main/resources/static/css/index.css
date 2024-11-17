@@ -591,3 +591,11 @@ video {
 #webcrumbs :is(.bg-neutral-200) {
   color: rgba(0, 0, 0, 0.9) !important;
 }
+
+#modelCar {
+  cursor: pointer;
+  max-width: 120px;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word;
+}

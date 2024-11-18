@@ -20,8 +20,9 @@ public class LoginController {
     public ResponseEntity<?> auth(@RequestParam String login, @RequestParam String pswd,
             @RequestParam(required = false) String email, HttpServletRequest request) {
 
-        if (email != null && !email.isEmpty()) {
-            // Логика регистрации
+        if (!email.isBlank()) {
+            // registration
+            
             System.out.println("Registration: Username: " + login + ", Password: " + pswd + ", Email: " + email);
             return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно зарегистрирован.");
         } else {

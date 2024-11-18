@@ -18,6 +18,8 @@ public class UserService {
         SUCCESS,
         USER_NOT_FOUND,
         PASSWORD_INCORRECT,
+        USER_ALREADY_EXISTS,
+        EMAIL_ALREADY_EXISTS
     }
 
     @Autowired
@@ -49,6 +51,24 @@ public class UserService {
             }
         }
         return authStatus;
+    }
+
+    public AuthStatus register(String login, String email, String password, HttpServletRequest request) {
+        if (userRepository.findByUsername(login) != null) {
+            return AuthStatus.USER_ALREADY_EXISTS;
+        }
+        if (userRepository.findByEmail(email) != null) {
+            return AuthStatus.EMAIL_ALREADY_EXISTS;
+        }
+
+        User user = SessionUtils.getUser(request);
+        user.setUsername(login);
+        user.setEmail(email);
+        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+        user.setPassword(encodedPassword);
+        
+        userRepository.save(user);
+        return AuthStatus.SUCCESS;
     }
 
     private boolean checkPassword(String rawPassword, String encodedPassword) {

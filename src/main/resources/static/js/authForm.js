@@ -59,3 +59,42 @@ $('#loginForm').on('submit', function (event) {
         }
     });
 });
+
+$('#registrationForm').on('submit', function (event) {
+    event.preventDefault();
+
+    var formData = $(this).serialize();
+
+    $.post('/auth', formData)
+        .done(function (data) {
+            if (data.success) {
+                $('#registrationForm button').hide();
+                $('#confirmationCodeContainer').show();
+                $('#message').text('Код отправлен на вашу почту.');
+            } else {
+                // Обработка ошибок
+                $('#message').text(data.message || 'Ошибка регистрации.');
+            }
+        })
+        .fail(function () {
+            $('#message').text('Ошибка при отправке данных.');
+        });
+});
+
+$('#confirmButton').on('click', function () {
+    var code = $('#confirmationCode').val();
+
+    // AJAX-запрос для проверки кода
+    $.post('/confirm-code', { confirmationCode: code })
+        .done(function (data) {
+            if (data.success) {
+                $('#message').text('Код подтвержден успешно!');
+                // Здесь можно перенаправить пользователя или выполнить другие действия
+            } else {
+                $('#message').text(data.message || 'Ошибка подтверждения кода.');
+            }
+        })
+        .fail(function () {
+            $('#message').text('Ошибка при подтверждении кода.');
+        });
+});

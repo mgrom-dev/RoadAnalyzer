@@ -2,19 +2,21 @@
     <div class="main">
         <input type="checkbox" id="chk" aria-hidden="true">
 
-        <div class="signup">
-            <form id="registrationForm">
+        <div class="signup container mt-5">
+            <form id="registrationForm" class="mb-4">
                 <label for="chk" aria-hidden="true">Регистрация</label>
-                <input type="text" name="login" placeholder="Логин" required="">
-                <input type="email" name="email" placeholder="Email" required autocomplete="email">
-                <input type="password" name="pswd" placeholder="Пароль" required="">
-                <button type="submit">Зарегистрироваться</button>
+                <input type="text" name="login" class="form-control mb-2" placeholder="Логин" required>
+                <input type="email" name="email" class="form-control mb-2" placeholder="Email" required
+                    autocomplete="email">
+                <input type="password" name="pswd" class="form-control mb-3" placeholder="Пароль" required>
+                <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
             </form>
 
-            <div id="confirmationCodeContainer" style="display: none;">
-                <label for="confirmationCode">Введите код, отправленный на вашу почту:</label>
-                <input type="text" id="confirmationCode" name="confirmationCode" placeholder="Код подтверждения" required="">
-                <button id="confirmButton">Подтвердить код</button>
+            <div id="confirmationCodeContainer" class="p-3 shadow-lg rounded-lg" style="display: none;">
+                <div class="small">Введите код, отправленный на вашу почту:</div>
+                <input type="text" id="confirmationCode" name="confirmationCode" class="form-control mb-1 mt-1"
+                    placeholder="Код подтверждения" required>
+                <button id="confirmButton" class="btn btn-success btn-block mt-1">Подтвердить код</button>
             </div>
         </div>
 

@@ -2,6 +2,7 @@ package ru.mgrom.roadanalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,26 +18,53 @@ public class LoginController {
     UserService userService;
 
     @PostMapping("/auth")
-    public ResponseEntity<?> auth(@RequestParam String login, @RequestParam String pswd,
+    public ResponseEntity<String> auth(@RequestParam String login, @RequestParam String pswd,
             @RequestParam(required = false) String email, HttpServletRequest request) {
 
-        if (!email.isBlank()) {
+        if (email != null && !email.isBlank()) {
             // registration
-            
-            System.out.println("Registration: Username: " + login + ", Password: " + pswd + ", Email: " + email);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь успешно зарегистрирован.");
+            AuthStatus status = userService.register(login, email, pswd, request);
+
+            return switch (status) {
+                case SUCCESS -> responseCreated("Пользователь успешно зарегестрирован.");
+                case USER_ALREADY_EXISTS -> responseConflict("Пользователь с таким логином уже зарегистрирован.");
+                case EMAIL_ALREADY_EXISTS -> responseConflict("Пользователь с таким email уже зарегистрирован.");
+                default -> responseServerError("Произошла ошибка. Попробуйте позже.");
+            };
         } else {
+            // authorization
             AuthStatus status = userService.authorize(login, pswd, request);
 
             return switch (status) {
-                case SUCCESS -> ResponseEntity.status(HttpStatus.FOUND).header("Location", "/").build();
-                case PASSWORD_INCORRECT -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("{\"error\": \"Неверный логин или пароль.\"}");
-                case USER_NOT_FOUND -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("{\"error\": \"Пользователь не найден.\"}");
-                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("{\"error\": \"Произошла ошибка. Попробуйте позже.\"}");
+                case SUCCESS -> responseFound();
+                case PASSWORD_INCORRECT -> responseUnauthorized("Неверный логин или пароль.");
+                case USER_NOT_FOUND -> responseUnauthorized("Пользователь не найден.");
+                default -> responseServerError("Произошла ошибка. Попробуйте позже.");
             };
         }
+    }
+
+    private ResponseEntity<String> responseEntity(HttpStatus httpStatus, String body) {
+        return ResponseEntity.status(httpStatus).contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+    private ResponseEntity<String> responseCreated(String message) {
+        return responseEntity(HttpStatus.CREATED, String.format("{\"success\": \"%s\"}", message));
+    }
+
+    private ResponseEntity<String> responseConflict(String message) {
+        return responseEntity(HttpStatus.CONFLICT, String.format("{\"message\": \"%s\"}", message));
+    }
+
+    private ResponseEntity<String> responseServerError(String message) {
+        return responseEntity(HttpStatus.INTERNAL_SERVER_ERROR, String.format("{\"message\": \"%s\"}", message));
+    }
+
+    private ResponseEntity<String> responseFound() {
+        return ResponseEntity.status(HttpStatus.FOUND).header("Location", "/").build();
+    }
+
+    private ResponseEntity<String> responseUnauthorized(String message) {
+        return responseEntity(HttpStatus.UNAUTHORIZED, String.format("{\"message\": \"%s\"}", message));
     }
 }

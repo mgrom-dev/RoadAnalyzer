@@ -67,17 +67,12 @@ $('#registrationForm').on('submit', function (event) {
 
     $.post('/auth', formData)
         .done(function (data) {
-            if (data.success) {
-                $('#registrationForm button').hide();
-                $('#confirmationCodeContainer').show();
-                $('#message').text('Код отправлен на вашу почту.');
-            } else {
-                // Обработка ошибок
-                $('#message').text(data.message || 'Ошибка регистрации.');
-            }
+            $('#registrationForm button').hide();
+            $('#confirmationCodeContainer').show();
+            $('#message').text('Код отправлен на вашу почту.');
         })
-        .fail(function () {
-            $('#message').text('Ошибка при отправке данных.');
+        .fail(function (data) {
+            $('#message').text(data?.responseJSON?.message || 'Ошибка при отправке данных.');
         });
 });
 

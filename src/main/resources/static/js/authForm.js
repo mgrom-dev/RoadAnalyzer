@@ -45,19 +45,16 @@ $("#showSettingsButton").click(function (event) {
 $('#loginForm').on('submit', function (event) {
     event.preventDefault(); // Предотвращаем стандартное поведение формы
 
-    $.ajax({
-        url: '/auth',
-        method: 'POST',
-        data: $(this).serialize(),
-        success: function (response) {
-            window.location.href = "/";
-        },
-        error: function (xhr) {
-            const errorResponse = JSON.parse(xhr.responseText);
-            $('#message').text(errorResponse.error);
+    $.post('/auth', $(this).serialize())
+        .done(function (data) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        })
+        .fail(function (data) {
             $('#message').css("color", "red");
-        }
-    });
+            $('#message').text(data?.responseJSON?.message || 'Ошибка при авторизации.');
+        });
 });
 
 $('#registrationForm').on('submit', function (event) {
@@ -67,9 +64,14 @@ $('#registrationForm').on('submit', function (event) {
 
     $.post('/auth', formData)
         .done(function (data) {
-            $('#registrationForm button').hide();
-            $('#confirmationCodeContainer').show();
-            $('#message').text('Код отправлен на вашу почту.');
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                $('#registrationForm button').hide();
+                $('#confirmationCodeContainer').show();
+                $('#message').css("color", "blue");
+                $('#message').text('Код отправлен на вашу почту.');
+            }
         })
         .fail(function (data) {
             $('#message').text(data?.responseJSON?.message || 'Ошибка при отправке данных.');
@@ -79,17 +81,11 @@ $('#registrationForm').on('submit', function (event) {
 $('#confirmButton').on('click', function () {
     var code = $('#confirmationCode').val();
 
-    // AJAX-запрос для проверки кода
     $.post('/verify', { confirmationCode: code })
         .done(function (data) {
-            if (data.success) {
-                $('#message').text('Код подтвержден успешно!');
-                // Здесь можно перенаправить пользователя или выполнить другие действия
-            } else {
-                $('#message').text(data.message || 'Ошибка подтверждения кода.');
-            }
+            $('#message').text('Код подтвержден успешно!');
         })
-        .fail(function () {
-            $('#message').text('Ошибка при подтверждении кода.');
+        .fail(function (data) {
+            $('#message').text(data?.responseJSON?.message || 'Ошибка при подтверждении кода.');
         });
 });

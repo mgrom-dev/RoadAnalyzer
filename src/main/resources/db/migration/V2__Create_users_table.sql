@@ -10,6 +10,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     database_identifier VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    verification_code VARCHAR(255),
     is_active BOOLEAN NOT NULL DEFAULT false
 );
 

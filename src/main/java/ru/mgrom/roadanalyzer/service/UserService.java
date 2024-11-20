@@ -1,6 +1,8 @@
 package ru.mgrom.roadanalyzer.service;
 
 import java.time.LocalDateTime;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ public class UserService {
         USER_ALREADY_EXISTS,
         EMAIL_ALREADY_EXISTS
     }
+
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     UserRepository userRepository;
@@ -48,6 +53,7 @@ public class UserService {
                 session.setUserId(user.getId());
                 session.setLastAccessedAt(LocalDateTime.now());
                 sessionRepository.save(session);
+            }
         }
         return authStatus;
     }
@@ -65,15 +71,19 @@ public class UserService {
         user.setEmail(email);
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
         user.setPassword(encodedPassword);
-        
+
         // Generate verification code
-        String verificationCode = RandomStringUtils.randomAlphanumeric(7);
+        String verificationCode = RandomStringUtils.secure().nextAlphanumeric(7);
         user.setVerificationCode(verificationCode);
-        
+
         userRepository.save(user);
 
         emailService.sendEmail(email, "Email Verification Code", "Your verification code is: " + verificationCode);
         return AuthStatus.SUCCESS;
+    }
+
+    public void logout(HttpServletRequest request) {
+        SessionUtils.logout(request);
     }
 
     private boolean checkPassword(String rawPassword, String encodedPassword) {

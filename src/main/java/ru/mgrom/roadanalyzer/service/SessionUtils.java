@@ -54,6 +54,12 @@ public class SessionUtils {
         return user;
     }
 
+    public static void logout(HttpServletRequest request) {
+        String sessionId = getSessionId(request);
+        Session session = sessionRepository.findBySessionId(sessionId);
+        sessionRepository.delete(session);
+    }
+
     public static Session getSession(HttpServletRequest request) {
         getUser(request); // call for create user and session if not exist
         return sessionRepository.findBySessionId(getSessionId(request));

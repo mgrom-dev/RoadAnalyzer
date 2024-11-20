@@ -22,17 +22,17 @@ spring:
     placeholders:
       proto_user_db: admin_db
   mail:
-    port: 587
+    host: smtp.mail.ru
+    port: 465
     username: YOUR_EMAIL@gmail.com
     password: YOUR_APP_PASSWORD
     properties:
       mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+        # mail.smtp.auth: true
+        mail.smtp.starttls.enable: false
+        mail.smtp.ssl.enable: true
   config:
-    import: optional:file:./application-secret.yml
+    import: "optional:classpath:application-secret.yml"
 
 logging:
   level:

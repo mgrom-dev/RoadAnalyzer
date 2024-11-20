@@ -35,6 +35,9 @@ public class User extends BaseEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "verification_code")
+    private String verificationCode;
+
     @Column(name = "is_active", nullable = false)
     private boolean isActive; // user status
 

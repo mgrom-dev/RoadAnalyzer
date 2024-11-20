@@ -44,6 +44,20 @@ public class LoginController {
         }
     }
 
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("code") String code, HttpServletRequest request) {
+        User user = userRepository.findByVerificationCode(code);
+        
+        if (user != null) {
+            user.setEnabled(true); // Enable the user account after verification
+            user.setVerificationCode(null); // Clear the verification code after use
+            userRepository.save(user);
+            return ResponseEntity.ok("Your email has been successfully verified.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid verification code.");
+        }
+    }
+
     private ResponseEntity<String> responseEntity(HttpStatus httpStatus, String body) {
         return ResponseEntity.status(httpStatus).contentType(MediaType.APPLICATION_JSON).body(body);
     }

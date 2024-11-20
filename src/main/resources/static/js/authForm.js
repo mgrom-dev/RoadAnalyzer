@@ -80,7 +80,7 @@ $('#confirmButton').on('click', function () {
     var code = $('#confirmationCode').val();
 
     // AJAX-запрос для проверки кода
-    $.post('/confirm-code', { confirmationCode: code })
+    $.post('/verify', { confirmationCode: code })
         .done(function (data) {
             if (data.success) {
                 $('#message').text('Код подтвержден успешно!');

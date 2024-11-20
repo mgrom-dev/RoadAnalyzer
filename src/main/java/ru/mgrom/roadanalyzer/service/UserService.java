@@ -48,7 +48,6 @@ public class UserService {
                 session.setUserId(user.getId());
                 session.setLastAccessedAt(LocalDateTime.now());
                 sessionRepository.save(session);
-            }
         }
         return authStatus;
     }
@@ -67,7 +66,13 @@ public class UserService {
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
         user.setPassword(encodedPassword);
         
+        // Generate verification code
+        String verificationCode = RandomStringUtils.randomAlphanumeric(7);
+        user.setVerificationCode(verificationCode);
+        
         userRepository.save(user);
+
+        emailService.sendEmail(email, "Email Verification Code", "Your verification code is: " + verificationCode);
         return AuthStatus.SUCCESS;
     }
 

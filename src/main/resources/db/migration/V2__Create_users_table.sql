@@ -10,6 +10,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     database_identifier VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    verification_code VARCHAR(255),
     is_active BOOLEAN NOT NULL DEFAULT false
 );
 
@@ -17,4 +18,4 @@ CREATE TABLE users (
 ALTER TABLE users ALTER COLUMN id SET DEFAULT NEXTVAL('USERS_SEQ');
 
 INSERT INTO users (id, username, password, role, email, database_identifier, created_at, is_active)
-VALUES (DEFAULT, 'admin', 'qwerty', 'admin', 'admin@example.com', 'admin_db', CURRENT_TIMESTAMP, TRUE);
+VALUES (DEFAULT, 'admin', '$2a$12$Auq8SqSbRsoVN9Y0.RxX5ueY1Oi1bYKzcR4CiptY2ls8kPFHKcJKu', 'admin', 'admin@example.com', 'admin_db', CURRENT_TIMESTAMP, TRUE);

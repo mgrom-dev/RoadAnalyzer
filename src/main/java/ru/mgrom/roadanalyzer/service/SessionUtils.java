@@ -31,7 +31,7 @@ public class SessionUtils {
         return request.getSession().getId();
     }
 
-    public static User getUser(HttpServletRequest request) { // 
+    public static User getUser(HttpServletRequest request) {
         Optional<Session> findedSession = Optional.ofNullable(sessionRepository.findBySessionId(getSessionId(request)));
         Optional<User> findedUser = userRepository.findById(findedSession.orElse(new Session()).getUserId());
         User user = null;
@@ -52,6 +52,12 @@ public class SessionUtils {
         }
 
         return user;
+    }
+
+    public static void logout(HttpServletRequest request) {
+        String sessionId = getSessionId(request);
+        Session session = sessionRepository.findBySessionId(sessionId);
+        sessionRepository.delete(session);
     }
 
     public static Session getSession(HttpServletRequest request) {

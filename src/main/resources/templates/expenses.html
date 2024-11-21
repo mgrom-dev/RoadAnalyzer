@@ -1,0 +1,61 @@
+<div class="expenses-container container">
+    <h3 class="text-xl mb-4 text-center">Список всех расходов</h3>
+    <table class="expenses-table table table-bordered">
+        <thead>
+            <tr class="align-middle">
+                <th>Дата</th>
+                <th>Описание</th>
+                <th>Количество</th>
+                <th>Сумма (₽)</th>
+            </tr>
+        </thead>
+        <tbody id="expensesList">
+            <!-- data added dynamic -->
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="editExpenseModal" tabindex="-1" aria-labelledby="editExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editExpenseModalLabel">Редактирование расхода</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editExpenseForm">
+                    <input type="hidden" id="expenseId" />
+                    <input type="hidden" id="partAndServiceId" />
+                    <input type="hidden" id="partType" />
+                    <input type="hidden" id="partTypeDescription" />
+                    <div class="mb-3">
+                        <label for="expenseDate" class="form-label">Дата</label>
+                        <input type="text" class="form-control" id="expenseDate" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label for="partDescription" class="form-label">Наименование</label>
+                        <input type="text" class="form-control" id="partDescription" autocomplete="off"/>
+                        <div id="suggestions" class="suggestions"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <input type="text" class="form-control" id="description" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="count" class="form-label">Количество</label>
+                        <input type="number" class="form-control" id="count" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Сумма</label>
+                        <input type="text" class="form-control" id="amount" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-danger" id="deleteExpenseBtn">Удалить</button>
+                <button type="button" class="btn btn-primary" id="saveChangesBtn">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>

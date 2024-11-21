@@ -1,34 +1,35 @@
 function loadContent(page) {
-    const contentDiv = document.getElementById("content");
+    return new Promise((resolve, reject) => {
+        const contentDiv = document.getElementById("content");
+        const xhr = new XMLHttpRequest();
 
-    // Создаем новый XMLHttpRequest
-    const xhr = new XMLHttpRequest();
+        xhr.open("GET", page, true); // true for async call
 
-    // Определяем, что делать при успешной загрузке
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            contentDiv.innerHTML = xhr.responseText; // Загружаем ответ в блок content
-
-            // Найти все теги <script> в загруженном содержимом
-            const scripts = contentDiv.getElementsByTagName('script');
-            for (let i = 0; i < scripts.length; i++) {
-                const newScript = document.createElement('script');
-                newScript.text = scripts[i].innerHTML; // Копируем текст скрипта
-                document.body.appendChild(newScript); // Добавляем скрипт в тело документа
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                contentDiv.innerHTML = xhr.responseText; // load response to content block
+                resolve(xhr.responseText); // then promiss with response text
+            } else {
+                const errorMessage = `Ошибка загрузки: ${xhr.statusText}`;
+                console.error(errorMessage);
+                contentDiv.innerHTML = `<p>${errorMessage}</p>`;
+                reject(new Error(errorMessage));
             }
-        } else {
-            contentDiv.innerHTML = `<p>Ошибка загрузки: ${xhr.statusText}</p>`;
-        }
-    };
+        };
 
-    // Открываем GET-запрос к нужной странице
-    xhr.open("GET", page);
+        xhr.onerror = function () {
+            const networkErrorMessage = 'Ошибка сети';
+            console.error(networkErrorMessage);
+            reject(new Error(networkErrorMessage));
+        };
 
-    // Отправляем запрос
-    xhr.send();
+        xhr.send();
+    });
 }
 
-// Загрузка страницы по умолчанию при первой загрузке
-document.addEventListener("DOMContentLoaded", function () {
-    loadContent('overview'); // Загружаем "Обзор расходов" по умолчанию
-});
+// content Tabs
+$("#overviewTab").click(e => loadContent('overview').then(text => loadOverviewData()));
+$("#expensesTab").click(e => loadContent('expenses').then(text => loadExpensesData()));
+
+// load the default block
+$("#overviewTab").click();

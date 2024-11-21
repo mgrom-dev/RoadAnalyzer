@@ -1,24 +1,62 @@
-<div id="authForm">
+<div id="authForm" th:fragment="authFormFragment">
     <div class="main">
         <input type="checkbox" id="chk" aria-hidden="true">
 
-        <div class="signup">
-            <form action="/auth" method="post">
+        <div class="signup container mt-5">
+            <form id="registrationForm" class="mb-4">
                 <label for="chk" aria-hidden="true">Регистрация</label>
-                <input type="text" name="login" placeholder="Логин" required="">
-                <input type="email" name="email" placeholder="Email" required="">
-                <input type="password" name="pswd" placeholder="Пароль" required="">
-                <button type="submit">Зарегестрироваться</button>
+                <input type="text" name="login" class="form-control mb-2" placeholder="Логин" required>
+                <input type="email" name="email" class="form-control mb-2" placeholder="Email" required
+                    autocomplete="email">
+                <input type="password" name="pswd" class="form-control mb-3" placeholder="Пароль" required>
+                <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
             </form>
+
+            <div id="confirmationCodeContainer" class="p-3 shadow-lg rounded-lg" style="display: none;">
+                <div class="small">Введите код, отправленный на вашу почту:</div>
+                <input type="text" id="confirmationCode" name="confirmationCode" class="form-control mb-1 mt-1"
+                    placeholder="Код подтверждения" required>
+                <button id="confirmButton" class="btn btn-success btn-block mt-1">Подтвердить код</button>
+            </div>
         </div>
 
         <div class="login">
-            <form action="/auth" method="post">
+            <form id="loginForm">
                 <label for="chk" aria-hidden="true">Авторизация</label>
                 <input type="text" name="login" placeholder="Логин" required="">
                 <input type="password" name="pswd" placeholder="Пароль" required="">
                 <button type="submit">Войти</button>
             </form>
         </div>
+
+        <div id="message"></div>
+    </div>
+</div>
+
+<div id="settingsForm" th:fragment="settingsFormFragment">
+    <div class="main">
+        <h2>Настройки пользователя</h2>
+
+        <form action="/change-password" method="post">
+            <label for="newPassword">Изменить пароль</label>
+            <input type="password" name="newPassword" placeholder="Новый пароль" required="">
+            <button type="submit">Сохранить пароль</button>
+        </form>
+
+        <form action="/change-avatar" method="post" enctype="multipart/form-data">
+            <label for="avatar">Изменить аватар</label>
+            <input type="file" name="avatar" accept="image/*" required="">
+            <button type="submit">Сохранить аватар</button>
+        </form>
+
+        <form action="/change-email" method="post">
+            <label for="newEmail">Изменить Email</label>
+            <input type="email" name="newEmail" placeholder="Новый Email" required="">
+            <button type="submit">Сохранить Email</button>
+        </form>
+
+        <form action="/logout" method="post">
+            <button type="submit">Выход</button>
+        </form>
     </div>
 </div>

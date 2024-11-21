@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GenericRepository<T> {
-    boolean save(T entity, String databaseIdentifier);
+    Long save(T entity, String databaseIdentifier);
+
+    boolean update(T entity, String databaseIdentifier);
+
+    Optional<T> find(T entity, String databaseIdentifier);
 
     Optional<T> findById(Long id, String databaseIdentifier);
 

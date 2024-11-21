@@ -1,7 +1,10 @@
 package ru.mgrom.roadanalyzer.service;
 
 import java.time.LocalDateTime;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +16,35 @@ import ru.mgrom.roadanalyzer.repository.UserRepository;
 
 @Service
 public class UserService {
+
+    public static enum AuthStatus {
+        SUCCESS,
+        USER_NOT_FOUND,
+        PASSWORD_INCORRECT,
+        USER_ALREADY_EXISTS,
+        EMAIL_ALREADY_EXISTS
+    }
+
+    @Autowired
+    EmailService emailService;
+
     @Autowired
     UserRepository userRepository;
 
     @Autowired
     SessionRepository sessionRepository;
 
-    public void authorize(String login, String password, HttpServletRequest request) {
+    @Value("${spring.mail.verification-required}")
+    private boolean verificationRequired;
+
+    public AuthStatus authorize(String login, String password, HttpServletRequest request) {
         User user = userRepository.findByUsername(login);
-        if (user != null && user.getPassword().equals(password)) {
+        AuthStatus authStatus = AuthStatus.SUCCESS;
+        if (user == null) {
+            authStatus = AuthStatus.USER_NOT_FOUND;
+        } else if (!checkPassword(password, user.getPassword())) {
+            authStatus = AuthStatus.PASSWORD_INCORRECT;
+        } else {
             String sessionId = SessionUtils.getSessionId(request);
             if (sessionId != null) {
                 Session session = sessionRepository.findBySessionId(sessionId);
@@ -34,12 +57,46 @@ public class UserService {
                 session.setUserId(user.getId());
                 session.setLastAccessedAt(LocalDateTime.now());
                 sessionRepository.save(session);
+
+                // if verification is disabled
+                if (!verificationRequired) {
+                    user.setActive(true);
+                    userRepository.save(user);
+                }
             }
-        } else if (user == null) {
-            System.out.println("login not found");
-        } else {
-            System.out.println("password incorrect");
         }
+        return authStatus;
+    }
+
+    public AuthStatus register(String login, String email, String password, HttpServletRequest request) {
+        if (userRepository.findByUsername(login) != null) {
+            return AuthStatus.USER_ALREADY_EXISTS;
+        }
+        if (userRepository.findByEmail(email) != null) {
+            return AuthStatus.EMAIL_ALREADY_EXISTS;
+        }
+
+        User user = SessionUtils.getUser(request);
+        user.setUsername(login);
+        user.setEmail(email);
+        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+        user.setPassword(encodedPassword);
+
+        // Generate verification code
+        String verificationCode = RandomStringUtils.secure().nextAlphanumeric(7);
+        user.setVerificationCode(verificationCode);
+
+        userRepository.save(user);
+
+        if (verificationRequired) {
+            emailService.sendEmail(email, "Email Verification Code", "Your verification code is: " + verificationCode);
+        }
+
+        return AuthStatus.SUCCESS;
+    }
+
+    public void logout(HttpServletRequest request) {
+        SessionUtils.logout(request);
     }
 
     private boolean checkPassword(String rawPassword, String encodedPassword) {

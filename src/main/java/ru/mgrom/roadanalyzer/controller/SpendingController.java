@@ -66,7 +66,7 @@ public class SpendingController {
     public ResponseEntity<IdResponse> create(@RequestBody SpendingDTO spendingDTO, HttpServletRequest request) {
         if (spendingDTO.getPartAndServiceId() == null) { // new part and service
             if (spendingDTO.getPartDescription().isBlank()) { // description not set, error
-                IdResponse response = new IdResponse("Failed to create spending: part and service not set", null);
+                IdResponse response = new IdResponse("Не удалось создать расходы: наименование не задано", null);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
@@ -91,7 +91,8 @@ public class SpendingController {
             if (partAndServiceOptional.isPresent()) {
                 spendingDTO.setPartAndServiceId(partAndServiceOptional.get().getId());
             } else {
-                IdResponse response = new IdResponse("Failed to create spending: part and service not created", null);
+                IdResponse response = new IdResponse("Не удалось создать расход: ошибка создания нового наименования",
+                        null);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
         }

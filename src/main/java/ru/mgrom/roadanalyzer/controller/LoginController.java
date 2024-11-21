@@ -77,7 +77,7 @@ public class LoginController {
             userRepository.save(user);
             return responseOk();
         } else {
-            return responseBadRequest("Invalid verification code.");
+            return responseBadRequest("Не правильный код верификации.");
         }
     }
 

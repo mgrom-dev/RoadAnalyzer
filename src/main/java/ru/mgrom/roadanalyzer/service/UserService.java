@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class UserService {
     @Autowired
     SessionRepository sessionRepository;
 
+    @Value("${spring.mail.verification-required}")
+    private boolean verificationRequired;
+
     public AuthStatus authorize(String login, String password, HttpServletRequest request) {
         User user = userRepository.findByUsername(login);
         AuthStatus authStatus = AuthStatus.SUCCESS;
@@ -53,6 +57,12 @@ public class UserService {
                 session.setUserId(user.getId());
                 session.setLastAccessedAt(LocalDateTime.now());
                 sessionRepository.save(session);
+
+                // if verification is disabled
+                if (!verificationRequired) {
+                    user.setActive(true);
+                    userRepository.save(user);
+                }
             }
         }
         return authStatus;
@@ -78,7 +88,10 @@ public class UserService {
 
         userRepository.save(user);
 
-        emailService.sendEmail(email, "Email Verification Code", "Your verification code is: " + verificationCode);
+        if (verificationRequired) {
+            emailService.sendEmail(email, "Email Verification Code", "Your verification code is: " + verificationCode);
+        }
+
         return AuthStatus.SUCCESS;
     }
 

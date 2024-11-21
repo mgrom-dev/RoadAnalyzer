@@ -83,7 +83,9 @@ $('#confirmButton').on('click', function () {
 
     $.post('/verify', { confirmationCode: code })
         .done(function (data) {
-            $('#message').text('Код подтвержден успешно!');
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
         })
         .fail(function (data) {
             $('#message').text(data?.responseJSON?.message || 'Ошибка при подтверждении кода.');

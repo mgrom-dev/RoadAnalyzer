@@ -1,6 +1,7 @@
 package ru.mgrom.roadanalyzer.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,9 @@ public class LoginController {
     @Autowired
     UserRepository userRepository;
 
+    @Value("${spring.mail.verification-required}")
+    private boolean verificationRequired;
+
     @PostMapping("/logout")
     public String logout(HttpServletRequest request) {
         userService.logout(request);
@@ -43,6 +47,15 @@ public class LoginController {
                 // if the user is successfully registered, but sending an email with a
                 // confirmation code is not available.
                 exception.printStackTrace();
+                User user = SessionUtils.getUser(request);
+                user.setActive(true);
+                userRepository.save(user);
+                userService.authorize(login, pswd, request);
+                return responseRedirect("/");
+            }
+
+            // if verification is not required, automatically authorize the user
+            if (!verificationRequired && status == AuthStatus.SUCCESS) {
                 userService.authorize(login, pswd, request);
                 return responseRedirect("/");
             }
@@ -75,7 +88,7 @@ public class LoginController {
             user.setActive(true);
             user.setVerificationCode(null);
             userRepository.save(user);
-            return responseOk();
+            return responseRedirect("/");
         } else {
             return responseBadRequest("Не правильный код верификации.");
         }
@@ -95,10 +108,6 @@ public class LoginController {
 
     private ResponseEntity<String> responseBadRequest(String message) {
         return responseEntity(HttpStatus.BAD_REQUEST, String.format("{\"message\": \"%s\"}", message));
-    }
-
-    private ResponseEntity<String> responseOk() {
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     private ResponseEntity<String> responseServerError(String message) {

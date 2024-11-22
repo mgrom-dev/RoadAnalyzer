@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 public class RoadanalyzerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RoadanalyzerApplication.class, args);
+		CsvToSqlMigration.parseCsvToSql("./Skoda Fabia II - spendings.csv", "./new_data.sql");
 	}
 
 	@Bean

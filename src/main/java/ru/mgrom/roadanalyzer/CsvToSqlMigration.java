@@ -2,21 +2,33 @@ package ru.mgrom.roadanalyzer;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Optional;
+import java.util.Locale;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVParser;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class CsvToSqlMigration {
 
     @Data
+    @AllArgsConstructor
     private static class Spending {
         String date;
         Integer partAndServiceId;
@@ -25,22 +37,30 @@ public class CsvToSqlMigration {
         Double amount;
     }
 
-    private static final String INSERT_TEMPLATE = "INSERT INTO admin_db.part_and_service (date, description, quantity, amount, type) VALUES ('%s', '%s', %d, %.2f, %d);";
+    @Data
+    @AllArgsConstructor
+    private static class PartAndService {
+        Integer id;
+        String description;
+        Integer expenseTypeId;
+    }
 
-    private Map<String, Integer> expenseTypeMap = new HashMap<>() {
+    private List<String> expenseTypes = new ArrayList<>() {
         {
-            put("топливо", 1);
-            put("услуги", 2);
-            put("запчасти", 3);
+            add("топливо");
+            add("услуги");
+            add("запчасти");
         }
     };
 
-    private Map<String, Integer> partAndServiceMap = new HashMap<>();
+    private Map<String, PartAndService> partAndServiceMap = new HashMap<>();
 
     private List<Spending> spendings = new ArrayList<>();
 
     private void parseCsv(String filePath, String outPath) {
-        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+        CSVParser csvParser = new CSVParserBuilder().withSeparator(';').build();
+
+        try (CSVReader reader = new CSVReaderBuilder(new FileReader(filePath)).withCSVParser(csvParser).build()) {
             String[] nextLine = reader.readNext();
             parseHeading(nextLine);
 
@@ -50,18 +70,56 @@ public class CsvToSqlMigration {
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
+
+        saveSqlToFile(outPath);
     }
 
     private void saveSqlToFile(String outPath) {
         StringBuilder sqlData = new StringBuilder();
+
         sqlData.append("INSERT INTO\r\n" + //
-                "    admin_db.part_and_service (description, type)\r\n" + //
+                "    admin_db.expense_type (description)\r\n" + //
+                "VALUES");
+        expenseTypes.forEach(expenseType -> sqlData.append(String.format("\r\n('%s'),", expenseType)));
+        sqlData.setLength(sqlData.length() - 1);
+        sqlData.append(";\r\n");
+
+        sqlData.append("INSERT INTO\r\n" + //
+                "    admin_db.part_and_service (id, description, type)\r\n" + //
                 "VALUES\r\n");
+        partAndServiceMap.values().forEach(ps -> sqlData
+                .append(String.format("\r\n(%d, '%s', %d),", ps.id, ps.description, ps.expenseTypeId)));
+        sqlData.setLength(sqlData.length() - 1);
+        sqlData.append(";\r\n");
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.#", new DecimalFormatSymbols(Locale.US));
+        sqlData.append("INSERT INTO\r\n" + //
+                "    admin_db.spending (date, part_and_service_id, description, count, amount)\r\n" + //
+                "VALUES\r\n");
+        spendings.forEach(sp -> sqlData
+                .append(String.format("\r\n('%s', %d, %s, %s, %s),",
+                        dbDate(sp.date), sp.partAndServiceId,
+                        sp.description == null ? "NULL" : "'" + sp.description + "'",
+                        decimalFormat.format(sp.count), decimalFormat.format(sp.amount))));
+        sqlData.setLength(sqlData.length() - 1);
+        sqlData.append(";");
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outPath), "UTF-8"))) {
+            writer.write(sqlData.toString());
+            writer.newLine();
+        } catch (IOException e) {
+            System.err.println("Error writing in file: " + e.getMessage());
+        }
+    }
+
+    private String dbDate(String date) {
+        String[] partsOfDate = date.split("\\.");
+        return partsOfDate[2] + "-" + partsOfDate[1] + "-" + partsOfDate[0];
     }
 
     private void parseHeading(String[] row) {
         for (int i = 5; i < row.length; i++) {
-            expenseTypeMap.put(row[i].trim(), i - 1);
+            expenseTypes.add(row[i].trim());
         }
     }
 
@@ -73,15 +131,21 @@ public class CsvToSqlMigration {
         // Extract count and name from description
         String[] descriptionParts = extractDescriptionAndQuantity(description);
         String itemName = descriptionParts[0];
-        int count = Integer.parseInt(descriptionParts[1]);
+        Double count = Double.parseDouble(descriptionParts[1]);
         String additionalDescription = descriptionParts[2];
 
-        // Генерация SQL-запросов для каждого типа расхода
-        for (int i = 3; i < row.length; i++) {
+        // generate new spending
+        for (int i = 2; i < row.length; i++) {
             if (!row[i].trim().isEmpty()) {
-                int expenseTypeId = expenseTypeMap.get(getHeader(i));
-                String sql = String.format(INSERT_TEMPLATE, date, itemName, count, amount, expenseTypeId);
-                System.out.println(sql); // Здесь можно заменить на запись в файл или другую обработку
+                int expenseTypeId = i - 1;
+                PartAndService partAndService = partAndServiceMap.get(itemName);
+                if (partAndService == null) {
+                    partAndService = new PartAndService(partAndServiceMap.size() + 1, itemName, expenseTypeId);
+                    partAndServiceMap.put(itemName, partAndService);
+                }
+                Spending newSpending = new Spending(date, partAndService.getId(), additionalDescription, count, amount);
+                spendings.add(newSpending);
+                break;
             }
         }
     }
@@ -100,45 +164,21 @@ public class CsvToSqlMigration {
     }
 
     private String[] extractDescriptionAndQuantity(String description) {
-        // Обновленное регулярное выражение для захвата текста в скобках
-        Pattern pattern = Pattern.compile("(.*?)(\\s*(\\d+)(шт|л)?)?\\s*(\\((.*?)\\))?$");
-        Matcher matcher = pattern.matcher(description);
-    
-        if (matcher.find()) {
-            String itemName = matcher.group(1).trim(); // Основное наименование
-            String quantityStr = matcher.group(3); // Количество
-            String additionalDescription = matcher.group(6); // Описание в скобках
-    
-            int quantity = (quantityStr != null) ? Integer.parseInt(quantityStr) : 1; // По умолчанию 1
-            
-            // Возвращаем наименование, количество и описание в скобках
-            return new String[] { itemName, String.valueOf(quantity), additionalDescription != null ? additionalDescription.trim() : null };
-        }
-    
-        return new String[] { description, "1", null }; // По умолчанию
-    }
+        Pattern countPattern = Pattern.compile("\\d*\\.?\\,?\\d+(?=шт\\.?|л\\.?)");
+        Pattern addDescPattern = Pattern.compile("(?<=\\().+(?=\\))");
+        String itemNameRegex = " ?-? ?\\(.+\\) ?| ?\\d*\\.?\\,?\\d+шт.?| ?\\d*\\.?\\,?\\d+л.?|\\s*\\n\\s*";
 
-    private String getHeader(int index) {
-        switch (index) {
-            case 2:
-                return "Прочие расходы";
-            case 3:
-                return "Бензин";
-            case 4:
-                return "Запчасти, расходники";
-            case 5:
-                return "Услуги автосервисов";
-            case 6:
-                return "Мойка";
-            case 7:
-                return "Комплектующие";
-            case 8:
-                return "Шиномонтаж";
-            case 9:
-                return "Страхование";
-            default:
-                return "";
-        }
+        String count = Optional.of(countPattern.matcher(description))
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group())
+                .orElse("1").replaceAll(",", ".");
+        String additionalDescription = Optional.of(addDescPattern.matcher(description))
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group())
+                .orElse(null);
+        String itemName = description.replaceAll(itemNameRegex, "");
+
+        return new String[] { itemName, count, additionalDescription };
     }
 
     public static void parseCsvToSql(String srcPath, String outPath) {

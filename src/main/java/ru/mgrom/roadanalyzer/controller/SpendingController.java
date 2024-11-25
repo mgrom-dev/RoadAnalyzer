@@ -55,12 +55,6 @@ public class SpendingController {
                 .ok(spendingService.getAllExpanded(createdAtBefore, createdAtAfter,
                         SessionUtils.getDatabaseId(request)));
     }
-    // @GetMapping("/{id}")
-    // public ResponseEntity<Spending> get(@PathVariable Long id) {
-    // return spendingService.getById(id)
-    // .map(ResponseEntity::ok)
-    // .orElseGet(() -> ResponseEntity.notFound().build());
-    // }
 
     @PostMapping
     public ResponseEntity<IdResponse> create(@RequestBody SpendingDTO spendingDTO, HttpServletRequest request) {
